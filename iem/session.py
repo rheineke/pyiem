@@ -41,6 +41,10 @@ class Session:
         data = {'market': market.value}
         response = self._session.post(url=url, data=data)
         dfs = pd.read_html(response.text, index_col=iem.CONTRACT)
+
+        # Expect a singleton list
+        assert len(dfs) == 1
+
         return dfs[0]
 
     def asset_holdings(self, asset):
@@ -49,10 +53,14 @@ class Session:
             'market': self._asset_market_dict[asset.value],
             'asset': asset.value,
             'activityType': 'holdings',
-            'viewAssetHoldings': 25,  # Number of transactions?
+            'viewAssetHoldings': 25,  # Number of transactions? Required?
         }
         response = self._session.post(url=url, data=data)
         dfs = pd.read_html(response.text, parse_dates=['Date'])
+
+        # Expect a singleton list
+        assert len(dfs) == 1
+
         return dfs[0]
 
     def asset_outstanding_orders(self, asset, side):
@@ -61,11 +69,15 @@ class Session:
             'market': self._asset_market_dict[asset.value],
             'asset': asset.value,
             'activityType': side,
-            'viewAssetHoldings': 1,
+            'viewAssetHoldings': 1,  # Required?
         }
         response = self._session.post(url=url, data=data)
         date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
         dfs = pd.read_html(response.text, parse_dates=date_cols)
+
+        # Expect a singleton list
+        assert len(dfs) == 1
+
         return dfs[0]
 
 
