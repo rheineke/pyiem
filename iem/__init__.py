@@ -11,11 +11,13 @@ __author__ = 'rheineke'
 
 CONTRACT = 'Contract'
 DVOL = '$Volume'
+EXPIRATION = 'Expiration'
 HIGH_PX = 'HighPrice'
 LOW_PX = 'LowPrice'
 LST_PX = 'LastPrice'
 MAX_CONTRACTS = 'Max Contracts Held'
 NET_POS = 'Net Position'
+ORDER_DATE = 'Order Date'
 PROFIT = 'Profit'
 SGN_ACTION = 'Signed Action'
 SGN_QTY = 'Signed Quantity'
@@ -24,8 +26,11 @@ TRADE_TYPE = 'Trade Type'
 UNIT_PX = 'Unit Price'
 VOL = 'Units'
 
-OLD_URL = 'iemweb.biz.uiowa.edu'
-URL = 'iem.uiowa.edu/iem'
+URL = 'https://iem.uiowa.edu/iem/'
+
+
+ASK = 'ask'
+BID = 'bid'
 
 
 @unique
