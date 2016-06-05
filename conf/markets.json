@@ -1,0 +1,55 @@
+{
+  "FedPolicyB": {
+    "id": 51,
+    "assets": {
+    },
+    "bundle": 697
+  },
+  "Congress16": {
+    "id": 360,
+    "assets": {
+      "DH_DS16": 3014,
+      "RH_DS16": 3015,
+      "DH_RS16": 3016,
+      "RH_RS16": 3017,
+      "OTHER16": 3018
+    },
+    "bundle": 698
+  },
+  "PRES16_VS": {
+    "id": 361,
+    "assets": {
+      "UDEM16_VS": 3019,
+      "UREP16_VS": 3020
+    },
+    "bundle": 699
+  },
+  "PRES16_WTA": {
+    "id": 362,
+    "assets": {
+      "DEM16_WTA": 3021,
+      "REP16_WTA": 3022
+    },
+    "bundle": 700
+  },
+  "RCONV16": {
+    "id": 364,
+    "assets": {
+      "CARS_NOM": 3034,
+      "CRUZ_NOM": 3035,
+      "RUBI_NOM": 3036,
+      "TRUM_NOM": 3037,
+      "RROF_NOM": 3038
+    },
+    "bundle": 702
+  },
+  "DCONV16": {
+    "id": 365,
+    "assets": {
+      "CLIN_NOM": 3039,
+      "SAND_NOM": 3040,
+      "DROF_NOM": 3041
+    },
+    "bundle": 703
+  }
+}
