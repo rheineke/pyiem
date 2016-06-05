@@ -14,7 +14,7 @@ if __name__ == '__main__':
     ob_df = sess.market_orderbook(mkt)
     # Get order activity
     asset = iem.RConv16.TRUM_NOM
-    oa_df = sess.asset_holdings(mkt, asset)
+    oa_df = sess.asset_holdings(asset)
     # Get outstanding orders
-    oo_df = sess.asset_outstanding_orders(mkt, asset, iem.BID)
+    oo_df = sess.asset_outstanding_orders(asset, iem.BID)
     logout_response = sess.logout()
