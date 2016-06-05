@@ -41,6 +41,7 @@ class Market(Enum):
     IEM numeric designation for each market. A market contains a set of
     arbitrageable contracts
     """
+    FedPolicyB = 51
     Congress16 = 360
     PRES16_VS = 361
     PRES16_WTA = 362
