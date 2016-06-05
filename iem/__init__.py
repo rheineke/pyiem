@@ -10,6 +10,7 @@ from enum import Enum, unique
 __author__ = 'rheineke'
 
 CONTRACT = 'Contract'
+DATE = 'Date'
 DVOL = '$Volume'
 EXPIRATION = 'Expiration'
 HIGH_PX = 'HighPrice'
@@ -27,6 +28,7 @@ UNIT_PX = 'Unit Price'
 VOL = 'Units'
 
 URL = 'https://iem.uiowa.edu/iem/'
+LEGACY_URL = 'https://iemweb.biz.uiowa.edu/'
 
 
 ASK = 'ask'

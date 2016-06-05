@@ -10,8 +10,7 @@ if __name__ == '__main__':
     sess = Session(**login_kwargs)
     login_response = sess.authenticate()
     # Get Orderbook dataframe
-    mkt = iem.Market.RCONV16
-    ob_df = sess.market_orderbook(mkt)
+    ob_df = sess.market_orderbook(iem.Market.RCONV16)
     # Get order activity
     asset = iem.RConv16.TRUM_NOM
     oa_df = sess.asset_holdings(asset)
