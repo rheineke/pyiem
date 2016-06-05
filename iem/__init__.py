@@ -57,11 +57,11 @@ class Congress16(Enum):
 
 @unique
 class RConv16(Enum):
-    CARS_NOM = 0
-    CRUZ_NOM = 1
-    RROF_NOM = 2
-    RUBI_NOM = 3
+    CARS_NOM = 3034
+    CRUZ_NOM = 3035
+    RUBI_NOM = 3036
     TRUM_NOM = 3037
+    RROF_NOM = 3038
 
 
 def market_contract_assets(market):

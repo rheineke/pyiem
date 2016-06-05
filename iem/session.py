@@ -1,3 +1,4 @@
+import json
 import pandas as pd
 import requests
 
@@ -11,6 +12,9 @@ class Session:
         self._logger = None
         # Start session
         self._session = requests.Session()
+        # Lookup tables
+        self._market_asset_dict = _read_markets_json()
+        self._asset_market_dict = _asset_market_dict(self._market_asset_dict)
 
     def authenticate(self):
         # Send login request to IEM
@@ -39,11 +43,10 @@ class Session:
         dfs = pd.read_html(response.text, index_col=iem.CONTRACT)
         return dfs[0]
 
-    # TODO: Asset uniquely defines market, remove market
-    def asset_holdings(self, market, asset):
+    def asset_holdings(self, asset):
         url = _build_url('TraderActivity.action')
         data = {
-            'market': market.value,
+            'market': self._asset_market_dict[asset.value],
             'asset': asset.value,
             'activityType': 'holdings',
             'viewAssetHoldings': 25,  # Number of transactions?
@@ -52,15 +55,15 @@ class Session:
         dfs = pd.read_html(response.text, parse_dates=['Date'])
         return dfs[0]
 
-    def asset_outstanding_orders(self, market, asset, side):
+    def asset_outstanding_orders(self, asset, side):
         url = _build_url('TraderActivity.action')
-        oo_data = {
-            'market': market.value,
+        data = {
+            'market': self._asset_market_dict[asset.value],
             'asset': asset.value,
             'activityType': side,
             'viewAssetHoldings': 1,
         }
-        response = self._session.post(url=url, data=oo_data)
+        response = self._session.post(url=url, data=data)
         date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
         dfs = pd.read_html(response.text, parse_dates=date_cols)
         return dfs[0]
@@ -68,3 +71,18 @@ class Session:
 
 def _build_url(path):
     return '{}{}'.format(iem.URL + 'trader/', path)
+
+
+def _read_markets_json(market_fp=None):
+    if market_fp is None:
+        market_fp = 'conf/markets.json'
+    with open(market_fp) as fp:
+        mkts = json.load(fp)
+    return mkts
+
+
+def _asset_market_dict(markets):
+    asset_mkt_dict = dict()
+    for mkt in markets.values():
+        asset_mkt_dict.update([(a, mkt['id']) for a in mkt['assets'].values()])
+    return asset_mkt_dict
