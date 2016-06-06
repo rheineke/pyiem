@@ -9,6 +9,7 @@ from enum import Enum, unique
 
 __author__ = 'rheineke'
 
+AVG_PX = 'AvgPrice'
 CONTRACT = 'Contract'
 DATE = 'Date'
 DVOL = '$Volume'
@@ -25,6 +26,7 @@ SGN_QTY = 'Signed Quantity'
 TRADE_ID = 'Trade ID'
 TRADE_TYPE = 'Trade Type'
 UNIT_PX = 'Unit Price'
+UNITS = 'Units'
 VOL = 'Units'
 
 URL = 'https://iem.uiowa.edu/iem/'
