@@ -1,6 +1,7 @@
 import datetime as dt
 import itertools
 
+import numpy as np
 import pandas as pd
 import requests
 
@@ -53,6 +54,17 @@ if __name__ == '__main__':
     # year = 2016
     # month = 6
     # px_hist_df = price_history_frame(mkt_id, year, month)
-    px_hist_dfs = full_price_history_frame(mkt_id)
+    px_hist_df = full_price_history_frame(mkt_id)
 
+    notnull_label = px_hist_df[iem.UNITS] != 0
+    c_gb = px_hist_df.loc[notnull_label].groupby(level=iem.CONTRACT)
+    agg_arg = {
+        iem.LOW_PX: np.min,
+        iem.HIGH_PX: np.max,
+        iem.UNITS: np.sum,
+        iem.DVOL: np.sum,
+        iem.LST_PX: lambda s: s.ix[-1],
+    }
+    agg_df = c_gb.agg(arg=agg_arg)
+    agg_df[iem.AVG_PX] = agg_df[iem.DVOL].div(agg_df[iem.UNITS]).round(3)
 
