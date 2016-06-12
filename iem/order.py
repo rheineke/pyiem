@@ -27,19 +27,18 @@ class PriceTimeLimit:
 
 
 @unique
-class CounterParty(Enum):
+class Counterparty(Enum):
     Exchange = 0
     Participant = 1
 
 
 class Order:
-    def __init__(self, side, quantity, price_time_limit, counterparty,
-                 request_code):
+    def __init__(self, side, quantity, price_time_limit, counterparty):
         self.side = side
         self.quantity = quantity
         self.price_time_limit = price_time_limit
         self.counterparty = counterparty
-        self.request_code = request_code
+        self.request_code = self.calc_request_code(side, price_time_limit)
 
     def calc_request_code(self, side, price_time_limit):
         if type(self) == Single:
@@ -54,7 +53,6 @@ class Order:
 class Single(Order):
     def __init__(self, contract, side, quantity, price_time_limit):
         super().__init__(side, quantity, price_time_limit,
-                         CounterParty.Participant,
-                         single_request_code(side, price_time_limit))
+                         Counterparty.Participant)
         self.contract = contract
 

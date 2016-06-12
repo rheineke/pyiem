@@ -1,4 +1,6 @@
 import json
+from urllib.parse import urlencode
+
 import pandas as pd
 import requests
 
@@ -34,18 +36,13 @@ class Session:
             self._logger.write(message)
 
     def logout(self):
-        return self._session.get(url=_build_url('TraderLogin.action?logout='))
+        data = urlencode(dict(logout=''))
+        return self._session.get(url=_build_url('TraderLogin.action?' + data))
 
     def market_orderbook(self, market):
         url = _build_url('MarketTrader.action')
         data = {'market': market.value}
-        response = self._session.post(url=url, data=data)
-        dfs = pd.read_html(response.text, index_col=iem.CONTRACT)
-
-        # Expect a singleton list
-        assert len(dfs) == 1
-
-        return dfs[0]
+        return self._post_frame(url, data, **dict(index_col=iem.CONTRACT))
 
     def asset_holdings(self, asset):
         url = _build_url('TraderActivity.action')
@@ -55,13 +52,7 @@ class Session:
             'activityType': 'holdings',
             'viewAssetHoldings': 25,  # Number of transactions? Required?
         }
-        response = self._session.post(url=url, data=data)
-        dfs = pd.read_html(response.text, parse_dates=['Date'])
-
-        # Expect a singleton list
-        assert len(dfs) == 1
-
-        return dfs[0]
+        return self._post_frame(url, data, **dict(parse_dates=['Date']))
 
     def asset_outstanding_orders(self, asset, side):
         url = _build_url('TraderActivity.action')
@@ -71,9 +62,51 @@ class Session:
             'activityType': side,
             'viewAssetHoldings': 1,  # Required?
         }
-        response = self._session.post(url=url, data=data)
         date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
-        dfs = pd.read_html(response.text, parse_dates=date_cols)
+        return self._post_frame(url, data, **dict(parse_dates=date_cols))
+
+    def place_order(self, order):
+        # 'MarketOrder.action'
+        url = _build_url('order/LimitOrder.action')
+        data = {
+            'limitOrderAssetToMarket': 285,
+            'orderType': 'bid',
+            'expirationDate': '2016/11/02 11:59 PM',  # '%Y/%m/%d %H:%M %p'
+            'price': '0.251',  # '{:1.2f}'
+            'limitOrderQuantity': '1',
+            'placeLimitOrder': 'Place Limit Order',
+            'market': '364'
+        }
+        return self._post_frame(url, data)
+
+    def place_market_order(self, order):
+        url = _build_url('order/MarketOrder.action')
+        data = {
+            'marketOrderAssetToMarket': 285,
+            'orderType': 'buy',
+            'marketOrderQuantity': '1',
+            'placeMarketOrder': 'Place Market Order',
+            'market': 364,
+        }
+        response = self._session.post(url=url, data=data)
+        return response
+
+    def cancel_order(self, order):
+        data = {
+            'cancelBidOrder': '',
+            'market': '364',
+            'bidOrder': '4602237',
+            'asset': '3037',
+            'activityType': 'bid',
+        }
+        url = _build_url('TraderActivity.action?' + urlencode(data))
+        response = self._session.get(url)
+        return response
+
+    def _post_frame(self, url, data, **kwargs):
+        # Use this in all the various function calls
+        response = self._session.post(url=url, data=data)
+        dfs = pd.read_html(response.text, **kwargs)
 
         # Expect a singleton list
         assert len(dfs) == 1
