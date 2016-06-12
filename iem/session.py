@@ -82,7 +82,7 @@ class Session:
 
 
 def _build_url(path):
-    return '{}{}'.format(iem.URL + 'trader/', path)
+    return ''.join([iem.URL, 'trader/', path])
 
 
 def _read_markets_json(market_fp=None):

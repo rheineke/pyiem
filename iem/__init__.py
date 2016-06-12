@@ -7,8 +7,6 @@ Public attributes:
 
 from enum import Enum, unique
 
-__author__ = 'rheineke'
-
 AVG_PX = 'AvgPrice'
 CONTRACT = 'Contract'
 DATE = 'Date'
