@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 
 import iem
+from iem.order import Single, Bundle
 
 
 class Session:
@@ -17,6 +18,7 @@ class Session:
         # Lookup tables
         self._market_asset_dict = _read_markets_json()
         self._asset_market_dict = _asset_market_dict(self._market_asset_dict)
+        self._order_market_dict = _order_market_dict(self._market_asset_dict)
 
     def authenticate(self):
         # Send login request to IEM
@@ -66,18 +68,37 @@ class Session:
         return self._post_frame(url, data, **dict(parse_dates=date_cols))
 
     def place_order(self, order):
-        # 'MarketOrder.action'
+        if type(order) == Single and order.price_time_limit is not None:
+            return self.place_limit_order(order)
+        elif type(order) == Bundle:
+            return self.place_bundle_order(order)
+        elif type(order) == Single and order.price_time_limit is None:
+            pass
+            # return self.place_market_order(order)
+
+    def place_limit_order(self, order):
         url = _build_url('order/LimitOrder.action')
         data = {
-            'limitOrderAssetToMarket': 285,
-            'orderType': 'bid',
-            'expirationDate': '2016/11/02 11:59 PM',  # '%Y/%m/%d %H:%M %p'
-            'price': '0.251',  # '{:1.2f}'
-            'limitOrderQuantity': '1',
+            'limitOrderAssetToMarket': order.contract,  # 285
+            'orderType': order_type(order.side),  # 'bid'
+            'expirationDate': order.price_time_limit.expiration,  # '2016/11/02 11:59 PM',  # '%Y/%m/%d %H:%M %p'
+            'price': '{:.2f}'.format(order.price_time_limit.price),  # '0.251'
+            'limitOrderQuantity': order.quantity,  # '1',
             'placeLimitOrder': 'Place Limit Order',
-            'market': '364'
+            'market': self._order_market_dict[order.contract],  # '364'
         }
         return self._post_frame(url, data)
+
+    def place_bundle_order(self, order):
+        url = _build_url('order/BundleOrder.action')
+        data = {
+            'bundle': order.contract_bundle,
+            'orderType': bundle_order_type(order.side, order.counterparty),
+            'bundleOrderQuantity': order.quantity,
+            'placeBundleOrder': 'Place Bundle Order',
+            'market': 51,
+        }
+        return self._post_frame(url=url, data=data)
 
     def place_market_order(self, order):
         url = _build_url('order/MarketOrder.action')
@@ -118,6 +139,17 @@ def _build_url(path):
     return ''.join([iem.URL, 'trader/', path])
 
 
+def order_type(side):
+    return 'bid' if side == iem.Side.BUY else 'ask'
+
+
+def bundle_order_type(side, counterparty):
+    if side == iem.Side.SELL:
+        return ''
+    else:
+        return 'buyAtFixed' if counterparty.Exchange else 'buyAtMarketAskPrice'
+
+
 def _read_markets_json(market_fp=None):
     if market_fp is None:
         market_fp = 'conf/markets.json'
@@ -129,5 +161,14 @@ def _read_markets_json(market_fp=None):
 def _asset_market_dict(markets):
     asset_mkt_dict = dict()
     for mkt in markets.values():
-        asset_mkt_dict.update([(a, mkt['id']) for a in mkt['assets'].values()])
+        assets = mkt['assets'].values()
+        asset_mkt_dict.update([(a['id'], mkt['id']) for a in assets])
+    return asset_mkt_dict
+
+
+def _order_market_dict(markets):
+    asset_mkt_dict = dict()
+    for mkt in markets.values():
+        assets = mkt['assets'].values()
+        asset_mkt_dict.update([(a['order'], mkt['id']) for a in assets])
     return asset_mkt_dict

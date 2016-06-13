@@ -2,7 +2,8 @@ import json
 
 import iem
 from iem.session import Session
-from iem.order import PriceTimeLimit, Side, Single
+from iem.order import PriceTimeLimit, Single
+from iem import Side
 
 if __name__ == '__main__':
     with open('conf/login.json') as fp:
