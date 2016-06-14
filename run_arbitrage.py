@@ -1,7 +1,7 @@
 import json
 from pprint import pprint
 
-from iem.contract import Contract
+from iem.contract import Contract, ContractBundle
 from iem.session import Session
 from iem.order import Bundle, PriceTimeLimit, Single, Counterparty
 from iem import Side
@@ -13,7 +13,7 @@ def arbitrage_orders(direction, quantity=1):
     expiration = '2016/06/30 11:59 PM'
     dir_pt_lmt = PriceTimeLimit(.20, expiration)
     dir_contract = Contract('FRsame0616')
-    contract_bundle = 704
+    contract_bundle = ContractBundle('FedPolicyB', '0616')
     other_contracts = [Contract('FRup0616'), Contract('FRdown0616')]
     other_pt_lmt = PriceTimeLimit(0.90, expiration)
     return [
@@ -35,6 +35,6 @@ if __name__ == '__main__':
     os = arbitrage_orders('same', quantity=1)
     pprint(os)
     responses = []
-    for o in os:
-        responses.append(sess.place_order(o))
+    # for o in os:
+    #     responses.append(sess.place_order(o))
     sess.logout()
