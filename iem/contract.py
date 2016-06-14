@@ -15,3 +15,18 @@ class Contract:
 
     def __repr__(self):
         return self.name
+
+
+class ContractBundle:
+    # Lookup tables
+    _market_asset_dict = iem.read_markets_json()
+
+    def __init__(self, mkt_name, expiration):
+        self.market_name = mkt_name
+        self.expiration = expiration
+        mkt = ContractBundle._market_asset_dict[mkt_name]
+        self.bundle_id = mkt['bundles'][expiration]
+        self.market = mkt['id']
+
+    def __repr__(self):
+        return self.market_name + ' ' + self.expiration

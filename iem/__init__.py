@@ -51,9 +51,9 @@ def read_markets_json(market_fp=None):
 
 
 def asset_dict(markets):
-    name_id_dict = dict()
+    asset_data_dict = dict()
     for mkt in markets.values():
         mkt_dict = {'mkt_id': mkt['id']}
         pairs = [(k, dict(v, **mkt_dict)) for k, v in mkt['assets'].items()]
-        name_id_dict.update(pairs)
-    return name_id_dict
+        asset_data_dict.update(pairs)
+    return asset_data_dict

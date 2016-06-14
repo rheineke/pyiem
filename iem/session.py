@@ -87,11 +87,11 @@ class Session:
     def place_bundle_order(self, order):
         url = _build_url('order/BundleOrder.action')
         data = {
-            'bundle': order.contract_bundle,
+            'bundle': order.contract_bundle.bundle_id,
             'orderType': bundle_order_type(order.side, order.counterparty),
             'bundleOrderQuantity': order.quantity,
             'placeBundleOrder': 'Place Bundle Order',
-            'market': 51,
+            'market': order.contract_bundle.market,
         }
         return self._post_frame(url=url, data=data)
 
