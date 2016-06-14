@@ -1,6 +1,7 @@
 import json
 from pprint import pprint
 
+from iem.contract import Contract
 from iem.session import Session
 from iem.order import Bundle, PriceTimeLimit, Single, Counterparty
 from iem import Side
@@ -11,13 +12,13 @@ def arbitrage_orders(direction, quantity=1):
     # than bundle + 2 sales
     expiration = '2016/06/30 11:59 PM'
     dir_pt_lmt = PriceTimeLimit(.20, expiration)
-    direction_contract = 291  # TODO: Lookup
+    dir_contract = Contract('FRsame0616')
     contract_bundle = 704
-    other_contracts = [290, 292]
+    other_contracts = [Contract('FRup0616'), Contract('FRdown0616')]
     other_pt_lmt = PriceTimeLimit(0.90, expiration)
     return [
         # Buy direction asset
-        Single(direction_contract, Side.BUY, quantity, dir_pt_lmt),
+        Single(dir_contract, Side.BUY, quantity, dir_pt_lmt),
         # Buy bundle asset
         Bundle(contract_bundle, Side.BUY, quantity, Counterparty.Exchange),
     ] + [  # Sell other two assets
