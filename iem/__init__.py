@@ -4,7 +4,7 @@ Public attributes:
 - Market
 - contract
 """
-
+import json
 from enum import Enum, unique
 
 AVG_PX = 'AvgPrice'
@@ -39,3 +39,21 @@ BID = 'bid'
 class Side(Enum):
     BUY = 0
     SELL = 1
+
+
+def read_markets_json(market_fp=None):
+    print('Read')
+    if market_fp is None:
+        market_fp = 'conf/markets.json'
+    with open(market_fp) as fp:
+        mkts = json.load(fp)
+    return mkts
+
+
+def asset_dict(markets):
+    name_id_dict = dict()
+    for mkt in markets.values():
+        mkt_dict = {'mkt_id': mkt['id']}
+        pairs = [(k, dict(v, **mkt_dict)) for k, v in mkt['assets'].items()]
+        name_id_dict.update(pairs)
+    return name_id_dict
