@@ -1,9 +1,8 @@
 import json
 
 import iem
+from iem.contract import Contract, Market
 from iem.session import Session
-from iem.order import PriceTimeLimit, Single
-from iem import Side
 
 if __name__ == '__main__':
     with open('conf/login.json') as fp:
@@ -12,15 +11,12 @@ if __name__ == '__main__':
     sess = Session(**login_kwargs)
     login_response = sess.authenticate()
     # Get Orderbook dataframe
-    # ob_df = sess.market_orderbook(iem.Market.RCONV16)
+    mkt = Market('RCONV16')
+    ob_df = sess.market_orderbook(mkt)
     # Get order activity
-    asset = iem.RConv16.TRUM_NOM
-    # oa_df = sess.asset_holdings(asset)
+    contract = Contract('TRUM_NOM')
+    oa_df = sess.asset_holdings(contract)
     # Get outstanding orders
-    oo_df = sess.asset_outstanding_orders(asset, iem.BID)
-    # Send order
-    contract = 3037  # RCONV16.TRUMP_NOM
-    price_time_limit = PriceTimeLimit(.25, '20161102')
-    o = Single(contract, Side.BUY, 1, price_time_limit)
-    latest_ob_df = sess.place_order(o)
+    oo_df = sess.asset_outstanding_orders(contract, iem.BID)
+    # Log out
     logout_response = sess.logout()
