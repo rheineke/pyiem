@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+import numpy as np
 import pandas as pd
 import requests
 
@@ -39,7 +40,8 @@ class Session:
     def market_orderbook(self, market):
         url = _build_url('MarketTrader.action')
         data = {'market': market.value}
-        return self._post_frame(url, data, **dict(index_col=iem.CONTRACT))
+        ob_df = self._post_frame(url, data, **dict(index_col=iem.CONTRACT))
+        return clean_orderbook_frame(ob_df)
 
     def asset_holdings(self, contract):
         url = _build_url('TraderActivity.action')
@@ -75,7 +77,7 @@ class Session:
         url = _build_url('order/LimitOrder.action')
         data = {
             'limitOrderAssetToMarket': order.contract.asset_to_market,
-            'orderType': order_type(order.side),
+            'orderType': limit_order_type(order.side),
             'expirationDate': order.price_time_limit.expiration,
             'price': '{:.2f}'.format(order.price_time_limit.price),
             'limitOrderQuantity': order.quantity,
@@ -99,7 +101,7 @@ class Session:
         url = _build_url('order/MarketOrder.action')
         data = {
             'marketOrderAssetToMarket': order.contract.asset_to_market,
-            'orderType': 'buy',
+            'orderType': market_order_type(order.side),
             'marketOrderQuantity': order.quantity,
             'placeMarketOrder': 'Place Market Order',
             'market': order.contract.market,
@@ -113,7 +115,7 @@ class Session:
             'market': order.contract.market,
             'bidOrder': order.id,
             'asset': order.contract.asset_id,
-            'activityType': 'bid',
+            'activityType': limit_order_type(order.side),
         }
         url = _build_url('TraderActivity.action?' + urlencode(data))
         response = self._session.get(url)
@@ -134,7 +136,11 @@ def _build_url(path):
     return ''.join([iem.URL, 'trader/', path])
 
 
-def order_type(side):
+def market_order_type(side):
+    return 'buy' if side == iem.Side.BUY else 'sell'
+
+
+def limit_order_type(side):
     return 'bid' if side == iem.Side.BUY else 'ask'
 
 
@@ -143,3 +149,25 @@ def bundle_order_type(side, counterparty):
         return ''
     else:
         return 'buyAtFixed' if counterparty.Exchange else 'buyAtMarketAskPrice'
+
+
+def clean_orderbook_frame(df):
+    cols = df.columns.tolist()[2:]
+    own = 'Own '
+    for best in [iem.BEST_ASK, iem.BEST_BID]:  # Ordered for prepend
+        best_cols = [best, own + best]
+        best_columns = dict((i, v) for i, v in enumerate(best_cols))
+        best_df = best_price_frame(df[best]).rename(columns=best_columns)
+        df[best_cols] = best_df
+        cols = best_cols + cols  # Prepend
+    return df[cols]
+
+
+def best_price_frame(srs):
+    df = srs.str.split(pat=' ', n=1, expand=True)
+    if len(df.columns) == 1:  # Handle no own best order
+        df[1] = None
+    to_replace = {0: {'--': np.nan}, 1: {None: False, '*': True}}
+    df.replace(to_replace=to_replace, inplace=True)
+    df[0] = df[0].astype(float)
+    return df

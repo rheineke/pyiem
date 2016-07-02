@@ -8,6 +8,8 @@ import json
 from enum import Enum, unique
 
 AVG_PX = 'AvgPrice'
+BEST_BID = 'Best Bid'
+BEST_ASK = 'Best Ask'
 CONTRACT = 'Contract'
 DATE = 'Date'
 DVOL = '$Volume'
@@ -42,7 +44,6 @@ class Side(Enum):
 
 
 def read_markets_json(market_fp=None):
-    print('Read')
     if market_fp is None:
         market_fp = 'conf/markets.json'
     with open(market_fp) as fp:
