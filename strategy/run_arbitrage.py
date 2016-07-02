@@ -6,6 +6,10 @@ from iem.session import Session
 from iem.order import Bundle, PriceTimeLimit, Single, Counterparty
 from iem import Side
 
+# TODO: Complete order logic - order sequence should be based on last known
+# orderbook. If orderbook is unknown (None), default to most likely sequence of
+# orders
+
 
 def arbitrage_orders(direction, quantity=1):
     # TODO: Most efficient action is to determine if single buy is lower price

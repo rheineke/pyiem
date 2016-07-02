@@ -1,3 +1,5 @@
+"""Individual contracts that comprise a market"""
+
 import iem
 
 
@@ -37,7 +39,7 @@ class ContractBundle:
         self.market_name = mkt_name
         self.expiration = expiration
         mkt = ContractBundle._market_asset_dict[mkt_name]
-        self.bundle_id = mkt['bundles'][expiration]
+        self.bundle_id = mkt['bundle'][expiration]
         self.market = mkt['id']
 
     def __repr__(self):
