@@ -7,6 +7,9 @@ Public attributes:
 import json
 from enum import Enum, unique
 
+# Exchange information
+ASK = 'ask'
+BID = 'bid'
 AVG_PX = 'AvgPrice'
 BEST_ASK = 'Best Ask'
 BEST_BID = 'Best Bid'
@@ -32,12 +35,14 @@ UNIT_PX = 'Unit Price'
 UNITS = 'Units'
 VOL = 'Units'
 
+# URLs
 URL = 'https://iem.uiowa.edu/iem/'
 LEGACY_URL = 'https://iemweb.biz.uiowa.edu/'
 
-
-ASK = 'ask'
-BID = 'bid'
+# Price values
+TICK = .001
+MAX_PRICE = 1
+MIN_PRICE = 0
 
 
 @unique
@@ -64,3 +69,19 @@ def asset_dict(markets):
         pairs = [(k, dict(v, **mkt_dict)) for k, v in mkt['assets'].items()]
         asset_data_dict.update(pairs)
     return asset_data_dict
+
+
+def price_name(side):
+    return BEST_BID if side is Side.BUY else BEST_ASK
+
+
+def move_inside(side, px_srs, increment):
+    return px_srs + increment if side is Side.BUY else px_srs - increment
+
+
+def most_outside_price(side):
+    return MIN_PRICE if side is Side.BUY else MAX_PRICE
+
+
+def is_outside(side, srs, other):
+    return srs < other if side is Side.BUY else srs > other
