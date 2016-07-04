@@ -49,6 +49,6 @@ if __name__ == '__main__':
     os = arbitrage_orders('same', quantity=1)
     pprint(os)
     responses = []
-    # for o in os:
+    # for o in outside:
     #     responses.append(sess.place_order(o))
     sess.logout()
