@@ -153,9 +153,9 @@ def bundle_order_type(side, counterparty):
 
 def clean_orderbook_frame(df):
     cols = df.columns.tolist()[2:]
-    own = 'Own '
+
     for best in [iem.BEST_ASK, iem.BEST_BID]:  # Ordered for prepend
-        best_cols = [best, own + best]
+        best_cols = [best, iem.OWN + best]
         best_columns = dict((i, v) for i, v in enumerate(best_cols))
         best_df = best_price_frame(df[best]).rename(columns=best_columns)
         df[best_cols] = best_df
