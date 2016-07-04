@@ -8,8 +8,8 @@ import json
 from enum import Enum, unique
 
 AVG_PX = 'AvgPrice'
-BEST_BID = 'Best Bid'
 BEST_ASK = 'Best Ask'
+BEST_BID = 'Best Bid'
 CONTRACT = 'Contract'
 DATE = 'Date'
 DVOL = '$Volume'
@@ -20,6 +20,9 @@ LST_PX = 'LastPrice'
 MAX_CONTRACTS = 'Max Contracts Held'
 NET_POS = 'Net Position'
 ORDER_DATE = 'Order Date'
+OWN = 'Own '
+OWN_BEST_ASK = OWN + BEST_ASK
+OWN_BEST_BID = OWN + BEST_BID
 PROFIT = 'Profit'
 SGN_ACTION = 'Signed Action'
 SGN_QTY = 'Signed Quantity'
@@ -41,6 +44,9 @@ BID = 'bid'
 class Side(Enum):
     BUY = 0
     SELL = 1
+
+    def opposite(self):
+        return Side.SELL if self.value is 0 else Side.BUY
 
 
 def read_markets_json(market_fp=None):

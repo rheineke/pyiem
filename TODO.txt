@@ -1,0 +1,16 @@
+Machine learning (ML) techniques are crucial to finding optimal separation of
+profitable and unprofitable actions, but there are important limits to what
+they can achieve. In particular, ML performs best with complete knowledge and
+this is definitely not possible in trading. If we have an accurate simulator,
+then we can remove ML models that do not handle partial information well though
+this doesn't help us to replace these models with something that does perform
+well.
+
+I see two ways to incorporate ML models into an algorithmic trading system.
+1. Price prediction modeling: model price changes with an objective function of
+correctly predicting direction and, equally important, magnitude. Changes that
+allow for market taking simplify the execution strategy at the cost of making
+model selection more difficult
+2. Action modeling: model various actions that the trading system make take to
+find a profitable solution. This has many degrees of freedom, but execution
+strategy is identified as part of the process of model selection

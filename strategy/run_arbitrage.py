@@ -11,6 +11,16 @@ from iem import Side
 # orders
 
 
+def arbitrage_frame(orderbook_df):
+    # Return true if there is an arbitrage available?
+    pass
+
+
+def no_arbitrage_best_own_order_frame(orderbook_df):
+    # Assume that only related contracts are in dataframe?
+    pass
+
+
 def arbitrage_orders(direction, quantity=1):
     # TODO: Most efficient action is to determine if single buy is lower price
     # than bundle + 2 sales
