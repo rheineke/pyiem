@@ -13,6 +13,7 @@ def _is_ioc(price, expiration):
         raise ValueError(fmt.format(price, expiration))
 
 
+# TODO: Write functools.wraps to strftime expiration
 class PriceTimeLimit:
     def __init__(self, price=np.nan, expiration=None):
         self.price = price

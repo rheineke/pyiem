@@ -5,6 +5,7 @@ Public attributes:
 - contract
 """
 import json
+from collections import OrderedDict
 from enum import Enum, unique
 
 # Exchange information
@@ -54,11 +55,12 @@ class Side(Enum):
         return Side.SELL if self.value is 0 else Side.BUY
 
 
-def read_markets_json(market_fp=None):
+def read_markets_json(market_fp=None, **load_kwargs):
     if market_fp is None:
         market_fp = 'conf/markets.json'
     with open(market_fp) as fp:
-        mkts = json.load(fp)
+        # Use OrderedDict to maintain ordering
+        mkts = json.load(fp, **load_kwargs)
     return mkts
 
 
@@ -71,8 +73,12 @@ def asset_dict(markets):
     return asset_data_dict
 
 
-def price_name(side):
+def best_price_name(side):
     return BEST_BID if side is Side.BUY else BEST_ASK
+
+
+def price_name(side):
+    return BID if side is Side.BUY else ASK
 
 
 def move_inside(side, px_srs, increment):
