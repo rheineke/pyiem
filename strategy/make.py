@@ -20,7 +20,7 @@ def best_price_frame(orderbook_df, most_inside_bundle_prices=None):
         most_inside_bundle_prices = MOST_INSIDE_BUNDLE_PRICE
         kwargs = {'most_inside_bundle_prices': most_inside_bundle_prices}
     order_df = bundle_gb.apply(nonarbitrage_group, **kwargs)
-    return order_df
+    return order_df.reset_index(level=0, drop=True)
 
 
 def nonarbitrage_group(group, most_inside_bundle_prices):
@@ -55,10 +55,10 @@ def next_best_rest_price_frame(orderbook_df):
 
 
 def _next_best_rest_series(side, orderbook_df):
-    px_col = iem.price_name(side)
+    px_col = iem.best_price_name(side)
     next_best_px_srs = iem.move_inside(side, orderbook_df[px_col], iem.TICK)
     next_best_px_srs.fillna(iem.most_outside_price(side), inplace=True)
-    opp_px_col = iem.price_name(side.opposite())
+    opp_px_col = iem.best_price_name(side.opposite())
     opp_mo_px = iem.most_outside_price(opp_px_col)
     curr_opp_px_srs = orderbook_df[opp_px_col].fillna(opp_mo_px)
     outside_label = iem.is_outside(side, next_best_px_srs, curr_opp_px_srs)
