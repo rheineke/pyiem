@@ -1,11 +1,6 @@
-"""Core classes and constants for the Iowa Electronic Market
+"""Core functions and constants for the Iowa Electronic Market"""
 
-Public attributes:
-- Market
-- contract
-"""
 import json
-from collections import OrderedDict
 from enum import Enum, unique
 
 # Exchange information
@@ -59,7 +54,6 @@ def read_markets_json(market_fp=None, **load_kwargs):
     if market_fp is None:
         market_fp = 'conf/markets.json'
     with open(market_fp) as fp:
-        # Use OrderedDict to maintain ordering
         mkts = json.load(fp, **load_kwargs)
     return mkts
 
@@ -74,20 +68,16 @@ def asset_dict(markets):
 
 
 def best_price_name(side):
-    return BEST_BID if side is Side.BUY else BEST_ASK
+    return side_value(side, BEST_BID, BEST_ASK)
 
 
 def price_name(side):
-    return BID if side is Side.BUY else ASK
-
-
-def move_inside(side, px_srs, increment):
-    return px_srs + increment if side is Side.BUY else px_srs - increment
+    return side_value(side, BID, ASK)
 
 
 def most_outside_price(side):
-    return MIN_PRICE if side is Side.BUY else MAX_PRICE
+    return side_value(side, MIN_PRICE, MAX_PRICE)
 
 
-def is_outside(side, srs, other):
-    return srs < other if side is Side.BUY else srs > other
+def side_value(side, buy_value, sell_value):
+    return buy_value if side is Side.BUY else sell_value

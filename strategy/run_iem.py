@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 import iem
+import iem.operator
 from iem.contract import Contract, Market
 from iem.session import Session
 from iem.order import PriceTimeLimit, Single
@@ -29,12 +30,12 @@ def strategy_best_price_frame(best_px_df, strategy_best_px_df):
     # Best bid
     strat_bb_srs = strategy_best_px_df[iem.BID]
     bb_srs = best_px_df[iem.BID]
-    bid_cond = iem.is_outside(iem.Side.BUY, bb_srs, strat_bb_srs)
+    bid_cond = iem.operator.outside(iem.Side.BUY, bb_srs, strat_bb_srs)
     order_df[iem.BID] = bb_srs.where(bid_cond)
     # Best ask
     strat_ba_srs = strategy_best_px_df[iem.ASK]
     ba_srs = best_px_df[iem.ASK]
-    ask_cond = iem.is_outside(iem.Side.SELL, ba_srs, strat_ba_srs)
+    ask_cond = iem.operator.outside(iem.Side.SELL, ba_srs, strat_ba_srs)
     order_df[iem.ASK] = ba_srs.where(ask_cond)
     return order_df
 
