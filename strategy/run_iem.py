@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 import iem
-import iem.operator
+from iem import operator
 from iem.contract import Contract, Market
 from iem.session import Session
 from iem.order import PriceTimeLimit, Single
@@ -14,15 +14,8 @@ from strategy import make
 
 
 def strategy_price_limit_frame(market):
-    mkt_json = iem.read_markets_json(**dict(object_pairs_hook=OrderedDict))
-    index = list(mkt_json[market.name]['assets'].keys())
-    bids = [np.nan, np.nan, np.nan, .001, .60, .01, .001, .10, .01, .001, .10, .01]
-    asks = [np.nan, np.nan, np.nan, .035, .999, .999, .999, .999, .999, .999, .999, .999]
-    data = OrderedDict([
-        (iem.BID, bids),
-        (iem.ASK, asks),
-    ])
-    return pd.DataFrame(data=data, index=index)
+    json_fp = 'conf/strategy_{}.json'.format(market.name)
+    return pd.read_json(json_fp, orient='index')
 
 
 def strategy_best_price_frame(best_px_df, strategy_best_px_df):
@@ -30,12 +23,12 @@ def strategy_best_price_frame(best_px_df, strategy_best_px_df):
     # Best bid
     strat_bb_srs = strategy_best_px_df[iem.BID]
     bb_srs = best_px_df[iem.BID]
-    bid_cond = iem.operator.outside(iem.Side.BUY, bb_srs, strat_bb_srs)
+    bid_cond = operator.outside(iem.Side.BUY)(bb_srs, strat_bb_srs)
     order_df[iem.BID] = bb_srs.where(bid_cond)
     # Best ask
     strat_ba_srs = strategy_best_px_df[iem.ASK]
     ba_srs = best_px_df[iem.ASK]
-    ask_cond = iem.operator.outside(iem.Side.SELL, ba_srs, strat_ba_srs)
+    ask_cond = operator.outside(iem.Side.SELL)(ba_srs, strat_ba_srs)
     order_df[iem.ASK] = ba_srs.where(ask_cond)
     return order_df
 
@@ -88,9 +81,10 @@ if __name__ == '__main__':
     strat_df = strategy_price_limit_frame(mkt)
     strat_best_px_df = strategy_best_price_frame(rest_best_px_df, strat_df)
     orders = generate_orders(strat_best_px_df, qty=1)
-    order_responses = []
-    for order in orders:
-        order_responses.append(sess.place_limit_order(order))
+    print(orders)
+    # order_responses = []
+    # for order in orders:
+    #     order_responses.append(sess.place_limit_order(order))
     # Log out
     logout_response = sess.logout()
 
