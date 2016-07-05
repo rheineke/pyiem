@@ -57,10 +57,10 @@ def next_best_rest_price_frame(orderbook_df):
 
 def _next_best_rest_series(side, orderbook_df):
     px_col = iem.best_price_name(side)
-    best_px_srs = operator.move_inside(side, orderbook_df[px_col], iem.TICK)
+    best_px_srs = operator.move_inside(side)(orderbook_df[px_col], iem.TICK)
     best_px_srs.fillna(iem.most_outside_price(side), inplace=True)
     opp_px_col = iem.best_price_name(side.opposite())
     opp_mo_px = iem.most_outside_price(opp_px_col)
     curr_opp_px_srs = orderbook_df[opp_px_col].fillna(opp_mo_px)
-    outside_label = operator.outside(side, best_px_srs, curr_opp_px_srs)
+    outside_label = operator.outside(side)(best_px_srs, curr_opp_px_srs)
     return best_px_srs.where(outside_label)
