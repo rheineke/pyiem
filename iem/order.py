@@ -1,4 +1,6 @@
+import datetime as dt
 from enum import Enum, unique
+from functools import wraps
 
 import numpy as np
 
@@ -13,7 +15,25 @@ def _is_ioc(price, expiration):
         raise ValueError(fmt.format(price, expiration))
 
 
-# TODO: Write functools.wraps to strftime expiration
+def strftime_expiration(func):
+    @wraps(func)
+    def wrapper(*args, **kwds):
+        # Find expiration argument
+        if len(args) == 2:
+            expiry_obj = args[1]
+        else:
+            expiry_obj = kwds.get('expiration', None)
+        if type(expiry_obj) == dt.date:
+            expiration_str = expiry_obj.strftime('%Y/%m/%d 23:59PM')
+        elif type(expiry_obj) == dt.datetime:
+            expiration_str = expiry_obj.strftime('%Y/%m/%d %H:%M%p')
+        elif type(expiry_obj) == str:
+            expiration_str = expiry_obj
+        return func(*args[:-1], expiration=expiration_str)
+    return wrapper
+
+
+# @strftime_expiration
 class PriceTimeLimit:
     def __init__(self, price=np.nan, expiration=None):
         self.price = price
