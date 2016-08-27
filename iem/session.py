@@ -164,6 +164,10 @@ def clean_orderbook_frame(df):
 
 
 def best_price_frame(srs):
+    if srs.dtype == np.float64:  # No own best orders and no NaN prices
+        df = srs.to_frame(0)
+        df[1] = False
+        return df
     df = srs.str.split(pat=' ', n=1, expand=True)
     if len(df.columns) == 1:  # Handle no own best order
         df[1] = None

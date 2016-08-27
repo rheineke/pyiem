@@ -66,22 +66,23 @@ if __name__ == '__main__':
 
     sess = Session(**login_kwargs)
     login_response = sess.authenticate()
+    print(login_response.request)
     # Get Orderbook dataframe
     mkt = Market('FedPolicyB')
     ob_df = sess.market_orderbook(mkt)
     # Get order activity
-    contract = Contract('FRsame0616')
-    oa_df = sess.asset_holdings(contract)
+    # contract = Contract('FRsame0616')
+    # oa_df = sess.asset_holdings(contract)
     # Get outstanding orders
-    oo_df = sess.asset_outstanding_orders(contract, iem.BID)
+    # oo_df = sess.asset_outstanding_orders(contract, iem.BID)
     # Send resting limit orders
-    rest_best_px_df = make.best_price_frame(ob_df)
+    # rest_best_px_df = make.best_price_frame(ob_df)
     # TODO: Use dynamic traded prices to adjust limit orders
     # TODO: Use fixed prices until dynamic prices can be determined
-    strat_df = strategy_price_limit_frame(mkt)
-    strat_best_px_df = strategy_best_price_frame(rest_best_px_df, strat_df)
-    orders = generate_orders(strat_best_px_df, qty=1)
-    print(orders)
+    # strat_df = strategy_price_limit_frame(mkt)
+    # strat_best_px_df = strategy_best_price_frame(rest_best_px_df, strat_df)
+    # orders = generate_orders(strat_best_px_df, qty=1)
+    # print(orders)
     # order_responses = []
     # for order in orders:
     #     order_responses.append(sess.place_limit_order(order))
