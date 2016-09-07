@@ -41,6 +41,26 @@ MAX_PRICE = 1
 MIN_PRICE = 0
 
 
+def read_markets_json(market_fp=None, **load_kwargs):
+    if market_fp is None:
+        market_fp = 'conf/markets.json'
+    with open(market_fp) as fp:
+        mkts = json.load(fp, **load_kwargs)
+    return mkts
+
+
+class Market:
+    # Lookup tables
+    _market_asset_dict = read_markets_json()
+
+    def __init__(self, name):
+        self.name = name
+        self.value = self._market_asset_dict[name]['id']
+
+    def __repr__(self):
+        return self.name
+
+
 @unique
 class Side(Enum):
     BUY = 0
@@ -48,14 +68,6 @@ class Side(Enum):
 
     def opposite(self):
         return Side.SELL if self.value is 0 else Side.BUY
-
-
-def read_markets_json(market_fp=None, **load_kwargs):
-    if market_fp is None:
-        market_fp = 'conf/markets.json'
-    with open(market_fp) as fp:
-        mkts = json.load(fp, **load_kwargs)
-    return mkts
 
 
 def asset_dict(markets):

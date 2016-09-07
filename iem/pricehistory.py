@@ -1,3 +1,5 @@
+"""Iowa Electronic Exchange Daily price history"""
+
 import datetime as dt
 import itertools
 
@@ -9,12 +11,16 @@ import iem
 
 
 def full_price_history_frame(mkt_id):
+    return pd.concat(_full_price_history_frames(mkt_id))
+
+
+def _full_price_history_frames(mkt_id):
     month_year_iter = history_dates(mkt_id=mkt_id)
     dfs = []
     for m, y in month_year_iter:
         # TODO: Handle future combinations
         dfs.append(price_history_frame(mkt_id, m, y))
-    return pd.concat(dfs)
+    return dfs
 
 
 def price_history_frame(mkt_id, year, month):
@@ -24,8 +30,12 @@ def price_history_frame(mkt_id, year, month):
     response = requests.post(url=url, data=data)
     index_cols = [iem.DATE, iem.CONTRACT]
     kwargs = dict(header=0, parse_dates=[iem.DATE], index_col=index_cols)
-    dfs = pd.read_html(response.text, **kwargs)
+    try:
+        dfs = pd.read_html(response.text, **kwargs)
+    except ValueError:
+        dfs = [pd.DataFrame()]
 
+    # Expect a MultiIndex with datetime and string levels
     # Expect a singleton list
     assert len(dfs) == 1
 
@@ -65,13 +75,14 @@ def agg_frame(df):
         iem.DVOL: np.sum,
         iem.LST_PX: lambda s: s.ix[-1],
     }
-    df = c_gb.agg(arg=agg_arg)
-    df[iem.AVG_PX] = df[iem.DVOL].div(df[iem.UNITS]).round(3)
+    agg_df = c_gb.agg(arg=agg_arg)
+    agg_df[iem.AVG_PX] = agg_df[iem.DVOL].div(agg_df[iem.UNITS]).round(3)
     return agg_df
 
 
 if __name__ == '__main__':
-    mkt_id = iem.Market.RCONV16.value
+    mkt = iem.Market('Congress16')
+    mkt_id = mkt.value
     # year = 2016
     # month = 6
     # px_hist_df = price_history_frame(mkt_id, year, month)

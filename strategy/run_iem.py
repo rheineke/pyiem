@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 
 import iem
-from iem import operator
-from iem.contract import Contract, Market
+from iem import operator, Market
+from iem.contract import Contract
 from iem.session import Session
 from iem.order import PriceTimeLimit, Single
 from strategy import make
