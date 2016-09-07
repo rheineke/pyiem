@@ -3,18 +3,6 @@
 import iem
 
 
-class Market:
-    # Lookup tables
-    _market_dict = iem.read_markets_json()
-
-    def __init__(self, name):
-        self.name = name
-        self.value = self._market_dict[name]['id']
-
-    def __repr__(self):
-        return self.name
-
-
 class Contract:
     # Lookup tables
     _market_asset_dict = iem.read_markets_json()
