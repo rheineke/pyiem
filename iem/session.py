@@ -79,7 +79,7 @@ class Session:
             'limitOrderAssetToMarket': order.contract.asset_to_market,
             'orderType': limit_order_type(order.side),
             'expirationDate': order.price_time_limit.expiration,
-            'price': '{:.2f}'.format(order.price_time_limit.price),
+            'price': '{:.3f}'.format(order.price_time_limit.price),
             'limitOrderQuantity': order.quantity,
             'placeLimitOrder': 'Place Limit Order',
             'market': order.contract.market,
