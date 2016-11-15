@@ -19,8 +19,8 @@ if __name__ == '__main__':
     # Get outstanding orders
     oo_df = sess.asset_outstanding_orders(asset, iem.BID)
     # Send order
-    contract = 3037  # RCONV16.TRUMP_NOM
-    price_time_limit = PriceTimeLimit(.25, '20161102')
-    o = Single(contract, Side.BUY, 1, price_time_limit)
-    latest_ob_df = sess.place_order(o)
+    # contract = 3037  # RCONV16.TRUMP_NOM
+    # price_time_limit = PriceTimeLimit(.25, '20161102')
+    # o = Single(contract, Side.BUY, 1, price_time_limit)
+    # latest_ob_df = sess.place_order(o)
     logout_response = sess.logout()

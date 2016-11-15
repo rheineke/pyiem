@@ -1,16 +1,23 @@
 from enum import Enum, unique
 
 import numpy as np
+import pandas as pd
 
 
 def _is_ioc(price, expiration):
     if np.isnan(price) and expiration is None:
         return True
-    elif not np.isnan(price) and expiration is not None:
+    elif not np.isnan(price):
         return False
     else:
         fmt = 'Price {} and expiration {} are not valid combination'
         raise ValueError(fmt.format(price, expiration))
+
+
+def to_string(expiration):
+    if expiration == pd.NaT:
+        return 'No expiration'
+    return '{:%Y-%m-%d %I:%M %p}'.format(expiration)
 
 
 class PriceTimeLimit:
@@ -18,6 +25,10 @@ class PriceTimeLimit:
         self.price = price
         self.expiration = expiration
         self.ioc = _is_ioc(price, expiration)
+
+    def __repr__(self):
+        fmt = '{price} {expiry}'
+        return fmt.format(self.price, to_string(self.expiration))
 
 
 @unique
