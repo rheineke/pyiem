@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def _is_ioc(price, expiration):
-    if np.isnan(price) and expiration is None:
+    if np.isnan(price) and pd.isnull(expiration):
         return True
     elif not np.isnan(price):
         return False
@@ -15,7 +15,7 @@ def _is_ioc(price, expiration):
 
 
 def to_string(expiration):
-    if expiration == pd.NaT:
+    if pd.isnull(expiration):
         return 'No expiration'
     return '{:%Y-%m-%d %I:%M %p}'.format(expiration)
 

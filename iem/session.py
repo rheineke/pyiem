@@ -161,14 +161,26 @@ def _read_markets_json(market_fp=None):
 def _asset_market_dict(markets):
     asset_mkt_dict = dict()
     for mkt in markets.values():
-        assets = mkt['assets'].values()
-        asset_mkt_dict.update([(a['id'], mkt['id']) for a in assets])
+        bundles = mkt['bundle']
+        if 'assets' in bundles:
+            assets = bundles['assets'].values()
+            asset_mkt_dict.update([(a['id'], mkt['id']) for a in assets])
+        else:
+            for bundle in bundles.values():
+                assets = bundle['assets'].values()
+                asset_mkt_dict.update([(a['id'], mkt['id']) for a in assets])
     return asset_mkt_dict
 
 
 def _order_market_dict(markets):
     asset_mkt_dict = dict()
     for mkt in markets.values():
-        assets = mkt['assets'].values()
-        asset_mkt_dict.update([(a['order'], mkt['id']) for a in assets])
+        bundles = mkt['bundle']
+        if 'assets' in bundles:
+            assets = bundles['assets'].values()
+            asset_mkt_dict.update([(a['order'], mkt['id']) for a in assets])
+        else:
+            for bundle in bundles.values():
+                assets = bundle['assets'].values()
+                asset_mkt_dict.update([(a['order'], mkt['id']) for a in assets])
     return asset_mkt_dict
