@@ -6,15 +6,20 @@ import pandas as pd
 import requests
 
 import iem
+from iem.contract import Market
 
 
 def full_price_history_frame(mkt_id):
+    return pd.concat(full_price_history_frames(mkt_id))
+
+
+def full_price_history_frames(mkt_id):
     month_year_iter = history_dates(mkt_id=mkt_id)
     dfs = []
     for m, y in month_year_iter:
-        # TODO: Handle future combinations
+        # TODO(rheineke): Handle future combinations
         dfs.append(price_history_frame(mkt_id, m, y))
-    return pd.concat(dfs)
+    return dfs
 
 
 def price_history_frame(mkt_id, year, month):
@@ -71,7 +76,7 @@ def agg_frame(df):
 
 
 if __name__ == '__main__':
-    mkt_id = iem.Market.RCONV16.value
+    mkt_id = Market('FedPolicyB').id
     # year = 2016
     # month = 6
     # px_hist_df = price_history_frame(mkt_id, year, month)

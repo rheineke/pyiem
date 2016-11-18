@@ -5,13 +5,13 @@ import pandas as pd
 
 from iem import Side
 from iem import config
-from iem.order import Market
+from iem.contract import Market
 from iem.order import PriceTimeLimit, Single, to_string
 
 
 class MarketTest(unittest.TestCase):
     def testMarketConstructor(self):
-        conf = config.read_markets_json()
+        conf = config.read_markets()
         for mkt_name in conf.keys():
             m = Market(mkt_name)
             self.assertEqual(m.name, mkt_name)

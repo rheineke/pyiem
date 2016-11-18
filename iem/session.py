@@ -1,11 +1,13 @@
+"""Iowa Electronic Markets session. All queries requiring login credentials are
+handled by the session object"""
 from urllib.parse import urlencode
 
 import pandas as pd
 import requests
 
 import iem
-from iem.config import read_markets_json
-from iem.order import Single, Bundle
+from iem.config import read_markets
+from iem.order import Single, Bundle, to_string
 
 
 class Session:
@@ -16,7 +18,7 @@ class Session:
         # Start session
         self._session = requests.Session()
         # Lookup tables
-        self._market_asset_dict = read_markets_json()
+        self._market_asset_dict = read_markets()
         self._asset_market_dict = _asset_market_dict(self._market_asset_dict)
         self._order_market_dict = _order_market_dict(self._market_asset_dict)
 
@@ -43,7 +45,7 @@ class Session:
 
     def market_orderbook(self, market):
         url = _build_url('MarketTrader.action')
-        data = {'market': market.value}
+        data = {'market': market.id}
         return self._post_frame(url, data, **dict(index_col=iem.CONTRACT))
 
     def asset_holdings(self, asset):
@@ -81,7 +83,7 @@ class Session:
         data = {
             'limitOrderAssetToMarket': order.contract,  # 285
             'orderType': order_type(order.side),  # 'bid'
-            'expirationDate': order.price_time_limit.expiration,  # '2016/11/02 11:59 PM',  # '%Y/%m/%d %H:%M %p'
+            'expirationDate': to_string(order.price_time_limit.expiration),
             'price': '{:.3f}'.format(order.price_time_limit.price),  # '0.251'
             'limitOrderQuantity': order.quantity,  # '1',
             'placeLimitOrder': 'Place Limit Order',

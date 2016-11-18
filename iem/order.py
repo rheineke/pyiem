@@ -3,13 +3,7 @@ from enum import Enum, unique
 import numpy as np
 import pandas as pd
 
-from iem import config
-
-
-class Market:
-    def __init__(self, market_name, market_fp=None):
-        self.name = market_name
-        self.id = config.read_markets_json(market_fp)[market_name]['id']
+from iem.contract import Market
 
 
 def _is_ioc(price, expiration):

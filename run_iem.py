@@ -2,17 +2,16 @@ import json
 
 import iem
 from iem.session import Session
+from iem.config import read_login
 from iem.order import PriceTimeLimit, Single
 from iem import Side
 
 if __name__ == '__main__':
-    with open('conf/login.json') as fp:
-        login_kwargs = json.load(fp)
-
+    login_kwargs = read_login()
     sess = Session(**login_kwargs)
     login_response = sess.authenticate()
     # Get Orderbook dataframe
-    # ob_df = sess.market_orderbook(iem.Market.RCONV16)
+    ob_df = sess.market_orderbook(iem.Market.RCONV16)
     # Get order activity
     asset = iem.RConv16.TRUM_NOM
     # oa_df = sess.asset_holdings(asset)
