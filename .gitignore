@@ -7,6 +7,7 @@ iem/__pycache__
 # IDE
 .idea/
 /.project
+ipsh.py
 
 # Configuration files
 conf/
