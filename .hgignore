@@ -1,9 +1,0 @@
-syntax: glob
-
-*.json
-
-*.pyc
-
-.idea/
-
-.ipynb*
