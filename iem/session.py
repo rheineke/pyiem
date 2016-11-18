@@ -1,10 +1,10 @@
-import json
 from urllib.parse import urlencode
 
 import pandas as pd
 import requests
 
 import iem
+from iem.config import read_markets_json
 from iem.order import Single, Bundle
 
 
@@ -16,7 +16,7 @@ class Session:
         # Start session
         self._session = requests.Session()
         # Lookup tables
-        self._market_asset_dict = _read_markets_json()
+        self._market_asset_dict = read_markets_json()
         self._asset_market_dict = _asset_market_dict(self._market_asset_dict)
         self._order_market_dict = _order_market_dict(self._market_asset_dict)
 
@@ -82,7 +82,7 @@ class Session:
             'limitOrderAssetToMarket': order.contract,  # 285
             'orderType': order_type(order.side),  # 'bid'
             'expirationDate': order.price_time_limit.expiration,  # '2016/11/02 11:59 PM',  # '%Y/%m/%d %H:%M %p'
-            'price': '{:.2f}'.format(order.price_time_limit.price),  # '0.251'
+            'price': '{:.3f}'.format(order.price_time_limit.price),  # '0.251'
             'limitOrderQuantity': order.quantity,  # '1',
             'placeLimitOrder': 'Place Limit Order',
             'market': self._order_market_dict[order.contract],  # '364'
@@ -148,14 +148,6 @@ def bundle_order_type(side, counterparty):
         return ''
     else:
         return 'buyAtFixed' if counterparty.Exchange else 'buyAtMarketAskPrice'
-
-
-def _read_markets_json(market_fp=None):
-    if market_fp is None:
-        market_fp = 'conf/markets.json'
-    with open(market_fp) as fp:
-        mkts = json.load(fp)
-    return mkts
 
 
 def _asset_market_dict(markets):

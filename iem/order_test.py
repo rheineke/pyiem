@@ -4,7 +4,18 @@ import numpy as np
 import pandas as pd
 
 from iem import Side
+from iem import config
+from iem.order import Market
 from iem.order import PriceTimeLimit, Single, to_string
+
+
+class MarketTest(unittest.TestCase):
+    def testMarketConstructor(self):
+        conf = config.read_markets_json()
+        for mkt_name in conf.keys():
+            m = Market(mkt_name)
+            self.assertEqual(m.name, mkt_name)
+            self.assertEqual(m.id, conf[mkt_name]['id'])
 
 
 def _test_expiry():
@@ -35,6 +46,11 @@ class PriceTimeLimitTest(unittest.TestCase):
 
     def testExpiryDate(self):
         pass
+
+    def testRepr(self):
+        ptl = PriceTimeLimit(.999, _test_expiry())
+        self.assertEqual(str(ptl), '0.999 2016-01-10 08:01 PM')
+
 
 class OrderTest(unittest.TestCase):
     def testConstructor(self):

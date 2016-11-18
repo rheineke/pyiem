@@ -3,6 +3,14 @@ from enum import Enum, unique
 import numpy as np
 import pandas as pd
 
+from iem import config
+
+
+class Market:
+    def __init__(self, market_name, market_fp=None):
+        self.name = market_name
+        self.id = config.read_markets_json(market_fp)[market_name]['id']
+
 
 def _is_ioc(price, expiration):
     if np.isnan(price) and pd.isnull(expiration):
@@ -21,14 +29,25 @@ def to_string(expiration):
 
 
 class PriceTimeLimit:
-    def __init__(self, price=np.nan, expiration=None):
+    def __init__(self, price=np.nan, expiration=pd.NaT):
         self.price = price
         self.expiration = expiration
         self.ioc = _is_ioc(price, expiration)
 
     def __repr__(self):
-        fmt = '{price} {expiry}'
-        return fmt.format(self.price, to_string(self.expiration))
+        fmt = '{price:.3f} {expiry}'
+        return fmt.format(price=self.price, expiry=to_string(self.expiration))
+
+
+class Contract:
+    def __init__(self, market_name, contract_name):
+        self.contract_name = contract_name
+        self.market = Market(market_name)
+        self.asset_id = None
+        self.asset_to_market_id = None
+
+    def __repr__(self):
+        return self.contract_name
 
 
 @unique
@@ -52,12 +71,11 @@ class Single(Order):
         self.contract = contract
 
     def __repr__(self):
-        fmt = 'Single {contract}: {side} {qty}@{price} {expiry} ({cp})'
+        fmt = 'Single {contract}: {side} {qty}@{pricetimelimit} ({cp})'
         kwargs = dict(contract=self.contract,
                       side=self.side,
                       qty=self.quantity,
-                      price=self.price_time_limit.price,
-                      expiry=self.price_time_limit.expiration,
+                      pricetimelimit=self.price_time_limit,
                       cp=self.counterparty)
         return fmt.format(**kwargs)
 
