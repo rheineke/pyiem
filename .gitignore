@@ -2,7 +2,7 @@
 
 # Python
 .cache/
-iem/__pycache__
+__pycache__
 
 # IDE
 .idea/

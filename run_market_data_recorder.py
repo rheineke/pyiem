@@ -19,7 +19,11 @@ if __name__ == '__main__':
     for mkt in mkts:
         ob_df = sess.market_orderbook(mkt)
         # Timestamp either from request object or created here
+        # Request own outstanding orders from each market
+        for asset in mkt_conf[mkt.name]['assets']:
+            oo_df = sess.asset_outstanding_orders()
     # Request own trades from each market (or is it one list for all markets?)
+    # Request position from each market
 
     # Record orderbooks after all session I/O to minimize time difference
     # between market snapshotes
