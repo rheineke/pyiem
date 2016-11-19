@@ -9,7 +9,8 @@
           "FRdown0616": {"id": 3044, "order": 292}
         },
         "bundle_id": 704,
-        "expiry_date": "2016-06-15"
+        "expiry_date": "2016-06-15",
+        "liquidation_date": "2016-06-15"
       },
       "0716": {
         "assets": {
@@ -18,7 +19,8 @@
           "FRdown0716": {"id": 3047, "order": 295}
         },
         "bundle_id": 705,
-        "expiry_date": "2016-07-27"
+        "expiry_date": "2016-07-27",
+        "liquidation_date": "2016-07-27"
       },
       "0916": {
         "assets": {
@@ -27,7 +29,8 @@
           "FRdown0916": {"id": 3050, "order": 298}
         },
         "bundle_id": 706,
-        "expiry_date": "2016-09-21"
+        "expiry_date": "2016-09-21",
+        "liquidation_date": "2016-09-21"
       },
       "1116": {
         "assets": {
@@ -36,7 +39,8 @@
           "FRdown1116": {"id": 3053, "order": 301}
         },
         "bundle_id": 707,
-        "expiry_date": "2016-11-02"
+        "expiry_date": "2016-11-02",
+        "liquidation_date": "2016-11-02"
       },
       "1216": {
         "assets": {
@@ -45,7 +49,8 @@
           "FRdown1216": {"id": 3056, "order": 304}
         },
         "bundle_id": 708,
-        "expiry_date": "2016-12-14"
+        "expiry_date": "2016-12-14",
+        "liquidation_date": ""
       },
       "0117": {
         "assets": {
@@ -54,7 +59,8 @@
           "FRdown0117": {"id": 3059, "order": 307}
         },
         "bundle_id": 709,
-        "expiry_date": "2017-02-01"
+        "expiry_date": "2017-02-01",
+        "liquidation_date": ""
       }
     }
   },
@@ -69,7 +75,8 @@
         "OTHER16": {"id": 3018, "order": 0 }
       },
       "bundle_id": 698,
-      "expiry_date": "2016-11-08"
+      "expiry_date": "2016-11-08",
+      "liquidation_date": "2016-11-09"
     }
   },
   "PRES16_VS": {
@@ -80,7 +87,8 @@
         "UREP16_VS": {"id": 3020, "order": 274}
       },
       "bundle_id": 699,
-      "expiry_date": "2016-11-08"
+      "expiry_date": "2016-11-08",
+      "liquidation_date": "2016-11-09"
     }
   },
   "PRES16_WTA": {
@@ -91,7 +99,8 @@
         "REP16_WTA": {"id": 3022, "order": 276}
       },
       "bundle_id": 700,
-      "expiry_date": "2016-11-08"
+      "expiry_date": "2016-11-08",
+      "liquidation_date": "2016-11-09"
     }
   },
   "RCONV16": {
@@ -105,7 +114,8 @@
         "RROF_NOM": {"id": 3038, "order": 286}
       },
       "bundle_id": 702,
-      "expiry_date": "2016-07-18"
+      "expiry_date": "2016-07-18",
+      "liquidation_date": "2016-07-18"
     }
   },
   "DCONV16": {
@@ -117,7 +127,8 @@
         "DROF_NOM": {"id": 3041, "order": 289}
       },
       "bundle_id": 703,
-      "expiry_date": "2016-07-25"
+      "expiry_date": "2016-07-25",
+      "liquidation_date": "2016-07-25"
     }
   }
 }
