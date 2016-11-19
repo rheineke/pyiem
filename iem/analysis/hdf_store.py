@@ -10,7 +10,7 @@ def open_store(mode=None):
     return pd.HDFStore(**kwargs)
 
 
-def retrieve_and_store_public_data():
+def retrieve_and_store_daily_data():
     mkt_conf = config.read_markets()
     for mkt_name in mkt_conf.keys():
         print(mkt_name)
@@ -34,7 +34,17 @@ def retrieve_and_store_public_data():
         else:
             px_hist_df = px_hist.full_price_history_frame(mkt_id)
         with open_store() as hdf_store:
-            hdf_store[mkt_name] = px_hist_df
+            hdf_store[mkt_name + '_' + px_hist.NAME] = px_hist_df
 
-if __name__ == '__main__':
-    retrieve_and_store_public_data()
+
+def retrieve_and_store_quote_data(snapshot_date):
+    mkt_conf = config.read_markets()
+    active_mkt_conf = config.active_markets(mkt_conf, snapshot_date)
+    for mkt_name in active_mkt_conf.keys():
+        print(mkt_name)
+        mkt = contract.Market(mkt_name)
+        quotes_df = px_hist.read_quote_frame(mkt.id)
+        # TODO(rheineke): Append only if it's a new timestamp
+        with open_store() as hdf_store:
+            key = mkt_name + '_' + 'quotes'
+            hdf_store.put(key=key, value=quotes_df, format='t', append=True)

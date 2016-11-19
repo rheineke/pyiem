@@ -7,6 +7,11 @@ Public attributes:
 
 from enum import Enum, unique
 
+# Iowa Electronic Market URLs
+URL = 'https://iem.uiowa.edu/iem/'
+LEGACY_URL = 'https://iemweb.biz.uiowa.edu/'
+
+# Iowa Electronic Market defined names
 AVG_PX = 'AvgPrice'
 CONTRACT = 'Contract'
 DATE = 'Date'
@@ -21,15 +26,15 @@ ORDER_DATE = 'Order Date'
 PROFIT = 'Profit'
 SGN_ACTION = 'Signed Action'
 SGN_QTY = 'Signed Quantity'
+SYMBOL = 'Symbol'
 TRADE_ID = 'Trade ID'
 TRADE_TYPE = 'Trade Type'
 UNIT_PX = 'Unit Price'
 UNITS = 'Units'
 VOL = 'Units'
 
-URL = 'https://iem.uiowa.edu/iem/'
-LEGACY_URL = 'https://iemweb.biz.uiowa.edu/'
-
+# Locally defined names
+TIMESTAMP = 'Timestamp'
 
 ASK = 'ask'
 BID = 'bid'
