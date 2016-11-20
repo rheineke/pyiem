@@ -1,13 +1,17 @@
+from pathlib import Path
+
 import pandas as pd
 
 import iem
 from iem import config, contract, pricehistory as px_hist
 
 
-def open_store(mode=None):
-    # TODO(rheineke): If data folder doesn't exist, create
-    kwargs = dict(path='data/iem.hdf', mode=mode)
-    return pd.HDFStore(**kwargs)
+def open_store(path=None, mode=None):
+    if path is None:
+        path = 'data/iem.hdf'
+    parent_path = Path(path).parent
+    parent_path.mkdir(parents=False, exist_ok=True)
+    return pd.HDFStore(path=path, mode=mode)
 
 
 def retrieve_and_store_daily_data():
@@ -44,7 +48,13 @@ def retrieve_and_store_quote_data(snapshot_date):
         print(mkt_name)
         mkt = contract.Market(mkt_name)
         quotes_df = px_hist.read_quote_frame(mkt.id)
-        # TODO(rheineke): Append only if it's a new timestamp
         with open_store() as hdf_store:
             key = mkt_name + '_' + 'quotes'
-            hdf_store.put(key=key, value=quotes_df, format='t', append=True)
+            # TODO(rheineke): Do not assume table exists
+            if key in hdf_store:
+                prev_df = hdf_store[key]
+                dedupe_idx = quotes_df.index.difference(prev_df.index)
+                iter_df = quotes_df.reindex(dedupe_idx)
+            else:
+                iter_df = quotes_df
+            hdf_store.put(key=key, value=iter_df, format='t', append=True)
