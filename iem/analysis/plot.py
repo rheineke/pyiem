@@ -1,10 +1,10 @@
-from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
+import iem
 from iem import config
 from iem.analysis import hdf_store
-import iem
 
 EXPIRY = 'expiry'
 EXPIRY_DATE = 'expiry_date'

@@ -41,11 +41,11 @@ def retrieve_and_store_daily_data():
             hdf_store[mkt_name + '_' + px_hist.NAME] = px_hist_df
 
 
-def retrieve_and_store_quote_data(snapshot_date):
+def read_and_write_quotes(snapshot_date):
     mkt_conf = config.read_markets()
     active_mkt_conf = config.active_markets(mkt_conf, snapshot_date)
     for mkt_name in active_mkt_conf.keys():
-        print(mkt_name)
+        print('{}: retrieving {}'.format(snapshot_date, mkt_name))
         mkt = contract.Market(mkt_name)
         quotes_df = px_hist.read_quote_frame(mkt.id)
         with open_store() as hdf_store:
@@ -58,3 +58,4 @@ def retrieve_and_store_quote_data(snapshot_date):
             else:
                 iter_df = quotes_df
             hdf_store.put(key=key, value=iter_df, format='t', append=True)
+        print('{}: completed {}'.format(pd.Timestamp.now(), mkt_name))

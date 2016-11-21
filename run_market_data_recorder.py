@@ -1,18 +1,32 @@
+import asyncio
+
 import pandas as pd
 
-from iem import config
-from iem.contract import Market
-from iem.session import Session
-from iem.analysis import hdf_store
+from iem import recorder
+
+
+def read_and_write_quotes(now, loop):
+    recorder.read_and_write_quotes(now)
+    delay = 15 * 60  # HTML is updated once every 15 minutes
+    loop.call_later(delay, read_and_write_quotes, pd.Timestamp.now(), loop)
 
 if __name__ == '__main__':
     # Publicly available data
     # Daily summary data
     # hdf_store.retrieve_and_store_daily_data()
-    # Quotes data
-    hdf_store.retrieve_and_store_quote_data(pd.Timestamp.now())
 
-    store = hdf_store.open_store(mode='r')
+    # Quotes data
+    loop = asyncio.get_event_loop()
+
+    # Schedule a call to retrieve quotes and store them
+    loop.call_soon(read_and_write_quotes, pd.Timestamp.now(), loop)
+
+    # Blocking call interrupted by loop.stop()
+    loop.run_forever()
+    loop.close()
+
+    # store = recorder.open_store(mode='r')
+    # quotes_hist_df = store['FedPolicyB_quotes']
 
     # Configuration
     # login_kwargs = config.read_login()
