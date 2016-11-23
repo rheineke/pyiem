@@ -3,8 +3,6 @@ from enum import Enum, unique
 import numpy as np
 import pandas as pd
 
-from iem.contract import Market
-
 
 def _is_ioc(price, expiration):
     if np.isnan(price) and pd.isnull(expiration):
@@ -33,17 +31,6 @@ class PriceTimeLimit:
         return fmt.format(price=self.price, expiry=to_string(self.expiration))
 
 
-class Contract:
-    def __init__(self, market_name, contract_name):
-        self.contract_name = contract_name
-        self.market = Market(market_name)
-        self.asset_id = None
-        self.asset_to_market_id = None
-
-    def __repr__(self):
-        return self.contract_name
-
-
 @unique
 class Counterparty(Enum):
     Exchange = 0
@@ -63,6 +50,7 @@ class Single(Order):
         super().__init__(side, quantity, price_time_limit,
                          Counterparty.Participant)
         self.contract = contract
+        self.id = None
 
     def __repr__(self):
         fmt = 'Single {contract}: {side} {qty}@{pricetimelimit} ({cp})'

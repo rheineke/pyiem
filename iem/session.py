@@ -48,23 +48,25 @@ class Session:
         data = {'market': market.id}
         return self._post_frame(url, data, **dict(index_col=iem.CONTRACT))
 
-    def asset_holdings(self, asset):
+    def asset_holdings(self, contract):
         url = _build_url('TraderActivity.action')
         data = {
-            'market': self._asset_market_dict[asset.value],
-            'asset': asset.value,
+            'market': contract.market.id,  # 51
+            'asset': contract.asset_id,  # 3054
             'activityType': 'holdings',
-            'viewAssetHoldings': 25,  # Number of transactions? Required?
+            'viewAssetHoldings': 25,  # Net position. Required?
+            # '_sourcePage': '',
+            # '_fp': '',
         }
         return self._post_frame(url, data, **dict(parse_dates=['Date']))
 
-    def asset_outstanding_orders(self, asset, side):
+    def asset_outstanding_orders(self, contract, side):
         url = _build_url('TraderActivity.action')
         data = {
-            'market': self._asset_market_dict[asset.value],
-            'asset': asset.value,
+            'market': contract.market.id,  # 51
+            'asset': contract.asset_id,  # 3056
             'activityType': side,
-            'viewAssetHoldings': 1,  # Required?
+            'viewAssetHoldings': 1,  # Number of open orders. Required?
         }
         date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
         return self._post_frame(url, data, **dict(parse_dates=date_cols))
@@ -81,7 +83,7 @@ class Session:
     def place_limit_order(self, order):
         url = _build_url('order/LimitOrder.action')
         data = {
-            'limitOrderAssetToMarket': order.contract,  # 285
+            'limitOrderAssetToMarket': order.contract.asset_to_market_id,  # 285
             'orderType': order_type(order.side),  # 'bid'
             'expirationDate': to_string(order.price_time_limit.expiration),
             'price': '{:.3f}'.format(order.price_time_limit.price),  # '0.251'
@@ -94,41 +96,62 @@ class Session:
     def place_bundle_order(self, order):
         url = _build_url('order/BundleOrder.action')
         data = {
-            'bundle': order.contract_bundle,
+            'bundle': order.contract_bundle.id,
             'orderType': bundle_order_type(order.side, order.counterparty),
             'bundleOrderQuantity': order.quantity,
             'placeBundleOrder': 'Place Bundle Order',
-            'market': 51,
+            'market': order.contract_bundle.market.id,
         }
         return self._post_frame(url=url, data=data)
 
     def place_market_order(self, order):
         url = _build_url('order/MarketOrder.action')
         data = {
-            'marketOrderAssetToMarket': 285,
-            'orderType': 'buy',
-            'marketOrderQuantity': '1',
+            'marketOrderAssetToMarket': order.contract.asset_to_market_id,
+            'orderType': str(order.side),
+            'marketOrderQuantity': order.quantity,
             'placeMarketOrder': 'Place Market Order',
-            'market': 364,
+            'market': order.contract.market.id,
         }
         response = self._session.post(url=url, data=data)
         return response
 
     def cancel_order(self, order):
+        side_str = order_type(order.side)
         data = {
-            'cancelBidOrder': '',
-            'market': '364',
-            'bidOrder': '4602237',
-            'asset': '3037',
-            'activityType': 'bid',
+            'cancel{}Order'.format(side_str.capitalize()): '',
+            'market': order.contract.market.id,
+            (side_str + 'Order'): order.id,
+            'asset': order.contract.asset_id,
+            'activityType': side_str,
         }
         url = _build_url('TraderActivity.action?' + urlencode(data))
+        response = self._session.get(url)
+        return response
+
+    def messages(self, market):
+        data = {
+            'home': '',
+            'market': market.id,
+        }
+        url = _build_url('TraderMessages.action?' + urlencode(data))
+        # return self._get_frame(url)
         response = self._session.get(url)
         return response
 
     def _post_frame(self, url, data, **kwargs):
         # Use this in all the various function calls
         response = self._session.post(url=url, data=data)
+        dfs = pd.read_html(response.text, **kwargs)
+
+        # Expect a singleton list
+        assert len(dfs) == 1
+
+        return dfs[0]
+
+    def _get_frame(self, url, **kwargs):
+        # Use this in all the various function calls
+        response = self._session.get(url=url)
         dfs = pd.read_html(response.text, **kwargs)
 
         # Expect a singleton list

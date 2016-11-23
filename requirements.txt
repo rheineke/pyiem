@@ -1,3 +1,5 @@
 ###### Requirements with Version Specifiers ######
 #   See https://www.python.org/dev/peps/pep-0440/#version-specifiers
 pandas == 0.19.1
+
+requests == 2.12.1

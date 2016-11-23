@@ -45,7 +45,7 @@ def read_and_write_quotes(snapshot_date):
     mkt_conf = config.read_markets()
     active_mkt_conf = config.active_markets(mkt_conf, snapshot_date)
     for mkt_name in active_mkt_conf.keys():
-        print('{}: retrieving {}'.format(snapshot_date, mkt_name))
+        print('{}: retrieving {}. . . '.format(snapshot_date, mkt_name), end='')
         mkt = contract.Market(mkt_name)
         quotes_df = px_hist.read_quote_frame(mkt.id)
         with open_store() as hdf_store:

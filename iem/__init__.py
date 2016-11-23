@@ -44,3 +44,9 @@ BID = 'bid'
 class Side(Enum):
     BUY = 0
     SELL = 1
+
+    # def __repr__(self):
+    #     return 'buy' if self == self.BUY else 'sell'
+
+    def __str__(self):
+        return 'buy' if self is self.BUY else 'sell'

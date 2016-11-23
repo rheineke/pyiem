@@ -14,6 +14,21 @@ def read_markets(market_fp=None):
     return mkts
 
 
+def find_bundle(json_obj, market_name, expiry_date_str):
+    bundle_value = json_obj[market_name]['bundle']
+
+    if 'bundle_id' in bundle_value:
+        return bundle_value
+
+    return bundle_value[expiry_date_str]
+
+
+def find_asset(json_obj, market_name, asset_name):
+    expiry_str = asset_name[-4:]
+    bundle_value = find_bundle(json_obj, market_name, expiry_str)
+    return bundle_value['assets'][asset_name]
+
+
 def active_markets(market_dict, active_date):
     # TODO(rheineke): Create bundle iterator?
     active_market_dict = {}

@@ -27,6 +27,7 @@ if __name__ == '__main__':
 
     # store = recorder.open_store(mode='r')
     # quotes_hist_df = store['FedPolicyB_quotes']
+    # assert(len(quotes_hist_df.index.unique()) == len(quotes_hist_df))
 
     # Configuration
     # login_kwargs = config.read_login()
