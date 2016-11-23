@@ -27,4 +27,10 @@ class Contract:
         self.asset_to_market_id = int(a['order'])
 
     def __repr__(self):
-        return self.contract_name
+        fmt = "{}: market: {}, asset_id: {}, asset_to_market_id: {}"
+        return fmt.format(
+            self.contract_name,
+            self.market,
+            self.asset_id,
+            self.asset_to_market_id
+        )

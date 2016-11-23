@@ -46,7 +46,9 @@ class Session:
     def market_orderbook(self, market):
         url = _build_url('MarketTrader.action')
         data = {'market': market.id}
-        return self._post_frame(url, data, **dict(index_col=iem.CONTRACT))
+        # TODO(rheineke): Quantity Held, Your Bids and Your Asks not parsed
+        kwargs = dict(index_col=iem.CONTRACT)
+        return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
 
     def asset_holdings(self, contract):
         url = _build_url('TraderActivity.action')
@@ -54,11 +56,12 @@ class Session:
             'market': contract.market.id,  # 51
             'asset': contract.asset_id,  # 3054
             'activityType': 'holdings',
-            'viewAssetHoldings': 25,  # Net position. Required?
+            # 'viewAssetHoldings': 25,  # Net position. Required?
             # '_sourcePage': '',
             # '_fp': '',
         }
-        return self._post_frame(url, data, **dict(parse_dates=['Date']))
+        kwargs = dict(index_col=iem.DATE, parse_dates=[iem.DATE])
+        return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
 
     def asset_outstanding_orders(self, contract, side):
         url = _build_url('TraderActivity.action')
@@ -66,10 +69,11 @@ class Session:
             'market': contract.market.id,  # 51
             'asset': contract.asset_id,  # 3056
             'activityType': side,
-            'viewAssetHoldings': 1,  # Number of open orders. Required?
+            # 'viewAssetHoldings': 1,  # Number of open orders. Required?
         }
         date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
-        return self._post_frame(url, data, **dict(parse_dates=date_cols))
+        kwargs = dict(index_col=iem.ORDER_DATE, parse_dates=date_cols)
+        return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
 
     def place_order(self, order):
         if type(order) == Single and order.price_time_limit is not None:
@@ -91,7 +95,7 @@ class Session:
             'placeLimitOrder': 'Place Limit Order',
             'market': self._order_market_dict[order.contract],  # '364'
         }
-        return self._post_frame(url, data)
+        return self._post_frame(url=url, data=data)
 
     def place_bundle_order(self, order):
         url = _build_url('order/BundleOrder.action')
@@ -135,29 +139,30 @@ class Session:
             'market': market.id,
         }
         url = _build_url('TraderMessages.action?' + urlencode(data))
-        # return self._get_frame(url)
-        response = self._session.get(url)
-        return response
+        date_cols = [iem.DATE, iem.EXPIRATION_DATE]
+        kwargs = dict(index_col=iem.DATE, parse_dates=date_cols)
+        return self._get_frame(url=url, read_html_kwargs=kwargs)
 
-    def _post_frame(self, url, data, **kwargs):
+    def _post_frame(self, url, data, read_html_kwargs=None):
+        if read_html_kwargs is None:
+            read_html_kwargs = {}
         # Use this in all the various function calls
         response = self._session.post(url=url, data=data)
-        dfs = pd.read_html(response.text, **kwargs)
+        return _frame(response, **read_html_kwargs)
 
-        # Expect a singleton list
-        assert len(dfs) == 1
-
-        return dfs[0]
-
-    def _get_frame(self, url, **kwargs):
+    def _get_frame(self, url, read_html_kwargs):
         # Use this in all the various function calls
         response = self._session.get(url=url)
-        dfs = pd.read_html(response.text, **kwargs)
+        return _frame(response, **read_html_kwargs)
 
-        # Expect a singleton list
-        assert len(dfs) == 1
 
-        return dfs[0]
+def _frame(response, **kwargs):
+    dfs = pd.read_html(response.text, **kwargs)
+
+    # Expect a singleton list
+    assert len(dfs) == 1
+
+    return dfs[0]
 
 
 def _build_url(path):
@@ -169,10 +174,11 @@ def order_type(side):
 
 
 def bundle_order_type(side, counterparty):
+    is_exch = counterparty is counterparty.Exchange
     if side == iem.Side.SELL:
-        return ''
+        return 'sellAtFixed' if is_exch else 'sellAtMarketBidPrice'
     else:
-        return 'buyAtFixed' if counterparty.Exchange else 'buyAtMarketAskPrice'
+        return 'buyAtFixed' if is_exch else 'buyAtMarketAskPrice'
 
 
 def _asset_market_dict(markets):

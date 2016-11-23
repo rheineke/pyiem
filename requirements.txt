@@ -1,5 +1,5 @@
 ###### Requirements with Version Specifiers ######
 #   See https://www.python.org/dev/peps/pep-0440/#version-specifiers
+# html5lib == 0.999  # Pandas complains if bad request
 pandas == 0.19.1
-
 requests == 2.12.1

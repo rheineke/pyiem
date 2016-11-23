@@ -1,22 +1,23 @@
-import json
-
 import iem
-from iem.session import Session
 from iem.config import read_login
-from iem.order import PriceTimeLimit, Single
-from iem import Side
+from iem.contract import Contract, Market
+from iem.session import Session
 
 if __name__ == '__main__':
     login_kwargs = read_login()
     sess = Session(**login_kwargs)
     login_response = sess.authenticate()
     # Get Orderbook dataframe
-    ob_df = sess.market_orderbook(iem.Market.RCONV16)
+    mkt = Market('FedPolicyB')
+    ob_df = sess.market_orderbook(mkt)
     # Get order activity
-    asset = iem.RConv16.TRUM_NOM
-    # oa_df = sess.asset_holdings(asset)
+    asset = Contract(mkt.name, 'FRup1216')
+    print(asset)
+    oa_df = sess.asset_holdings(asset)
     # Get outstanding orders
     oo_df = sess.asset_outstanding_orders(asset, iem.BID)
+    # Get trade messages
+    msg_df = sess.messages(mkt)
     # Send order
     # contract = 3037  # RCONV16.TRUMP_NOM
     # price_time_limit = PriceTimeLimit(.25, '20161102')
