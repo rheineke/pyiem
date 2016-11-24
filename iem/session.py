@@ -1,6 +1,9 @@
 """Iowa Electronic Markets session. All queries requiring login credentials are
 handled by the session object"""
-from urllib.parse import urlencode
+from collections import defaultdict
+
+from lxml import etree
+from urllib.parse import urlencode, parse_qs
 
 import pandas as pd
 import requests
@@ -46,9 +49,11 @@ class Session:
     def market_orderbook(self, market):
         url = _build_url('MarketTrader.action')
         data = {'market': market.id}
-        # TODO(rheineke): Quantity Held, Your Bids and Your Asks not parsed
-        kwargs = dict(index_col=iem.CONTRACT)
-        return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
+        response = self._session.post(url=url, data=data)
+
+        df = _frame(response, **dict(index_col=iem.CONTRACT))
+        alt_df = _orderbook_tag_frame(response.text)
+        return df.combine_first(alt_df)
 
     def asset_holdings(self, contract):
         url = _build_url('TraderActivity.action')
@@ -71,9 +76,17 @@ class Session:
             'activityType': side,
             # 'viewAssetHoldings': 1,  # Number of open orders. Required?
         }
+        response = self._session.post(url=url, data=data)
+
         date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
         kwargs = dict(index_col=iem.ORDER_DATE, parse_dates=date_cols)
-        return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
+        # return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
+
+        df = _frame(response, **kwargs)
+        oid_df = _order_id_tag_frame(response.text)
+        cxl_o = iem.CANCEL_ORDER
+        df[cxl_o] = df[cxl_o].combine_first(oid_df[cxl_o])
+        return df
 
     def place_order(self, order):
         if type(order) == Single and order.price_time_limit is not None:
@@ -157,6 +170,7 @@ class Session:
 
 
 def _frame(response, **kwargs):
+    print(response.text)
     dfs = pd.read_html(response.text, **kwargs)
 
     # Expect a singleton list
@@ -179,6 +193,61 @@ def bundle_order_type(side, counterparty):
         return 'sellAtFixed' if is_exch else 'sellAtMarketBidPrice'
     else:
         return 'buyAtFixed' if is_exch else 'buyAtMarketAskPrice'
+
+
+def _num_open_orders(tr_elem, klass):
+    td = tr_elem.find(path="td[@class='{}']".format(klass))
+    form = td.find('form')
+    if form is None:
+        return pd.to_numeric(td.text)
+    else:
+        val = form.find(path="input[@name='viewAssetHoldings']").attrib['value']
+        return pd.to_numeric(val)
+
+
+def _table_text(text):
+    start_idx = text.index('<table')
+    tbl = '</table>'
+    end_idx = text.index(tbl) + len(tbl)
+    return text[start_idx:end_idx]
+
+
+def _orderbook_tag_frame(text):
+    # This function can be removed if this pandas feature request is implemented
+    # https://github.com/pandas-dev/pandas/issues/14608
+    table_str = _table_text(text)
+    root = etree.fromstring(table_str)
+    table_body = root.find('tbody')
+    index = []
+    data = defaultdict(list)
+    # Iterator of tr objects
+    qty_path = "td[@class='change-cell quantity']"
+    tr_iter = table_body.iter(tag='tr')
+    for tr in tr_iter:
+        index.append(tr.find(path='td').text.strip())
+        # Quantity Held
+        pos = pd.to_numeric(tr.find(path=qty_path).attrib['value'])
+        data[iem.QUANTITY_HELD].append(pos)
+        # Your Bids
+        data[iem.YOUR_BIDS].append(_num_open_orders(tr, 'yourBidsCell'))
+        # Your Asks
+        data[iem.YOUR_ASKS].append(_num_open_orders(tr, 'yourAsksCell'))
+
+    return pd.DataFrame(data=data, index=index)
+
+
+def _order_id_tag_frame(text):
+    root = etree.fromstring(_table_text(text))
+    tbody = root.find('tbody')
+    index_data = []
+    data = defaultdict(list)
+    for tr in tbody.iter(tag='tr'):
+        index_data.append(pd.to_datetime(tr.find('td').text))
+        a = tr.find('td/a')
+        href = parse_qs(a.attrib['href'])
+        data[iem.CANCEL_ORDER].append(float(href['bidOrder'][0]))
+    index_data = pd.DatetimeIndex(data=index_data, name=iem.ORDER_DATE)
+    return pd.DataFrame(data=data, index=index_data)
 
 
 def _asset_market_dict(markets):
