@@ -9,13 +9,13 @@ if __name__ == '__main__':
     login_response = sess.authenticate()
     # Get Orderbook dataframe
     mkt = Market('FedPolicyB')
-    ob_df = sess.market_orderbook(mkt)
+    ob_df = sess.orderbook(mkt)
     # Get order activity
     asset = Contract(mkt.name, 'FRup1216')
     print(asset)
-    oa_df = sess.asset_holdings(asset)
+    oa_df = sess.holdings(asset)
     # Get outstanding orders
-    oo_df = sess.asset_outstanding_orders(asset, iem.BID)
+    oo_df = sess.outstanding_orders(asset, iem.BID)
     # Get trade messages
     msg_df = sess.messages(mkt)
     # Send order

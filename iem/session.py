@@ -46,7 +46,7 @@ class Session:
         data = urlencode(dict(logout=''))
         return self._session.get(url=_build_url('TraderLogin.action?' + data))
 
-    def market_orderbook(self, market):
+    def orderbook(self, market):
         url = _build_url('MarketTrader.action')
         data = {'market': market.id}
         response = self._session.post(url=url, data=data)
@@ -55,7 +55,7 @@ class Session:
         alt_df = _orderbook_tag_frame(response.text)
         return df.combine_first(alt_df)
 
-    def asset_holdings(self, contract):
+    def holdings(self, contract):
         url = _build_url('TraderActivity.action')
         data = {
             'market': contract.market.id,  # 51
@@ -68,7 +68,7 @@ class Session:
         kwargs = dict(index_col=iem.DATE, parse_dates=[iem.DATE])
         return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
 
-    def asset_outstanding_orders(self, contract, side):
+    def outstanding_orders(self, contract, side):
         url = _build_url('TraderActivity.action')
         data = {
             'market': contract.market.id,  # 51
@@ -143,7 +143,7 @@ class Session:
             'activityType': side_str,
         }
         url = _build_url('TraderActivity.action?' + urlencode(data))
-        response = self._session.get(url)
+        response = self._session.get(url)  # Almost certainly wrong
         return response
 
     def messages(self, market):
