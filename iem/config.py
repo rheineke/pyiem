@@ -3,6 +3,10 @@ import json
 
 import pandas as pd
 
+# Variables defined in configuration file but not explicitly on website
+_ASSETS = 'assets'
+BUNDLE = 'bundle'
+BUNDLE_ID = 'bundle_id'
 _LIQUIDATION_DATE = 'liquidation_date'
 
 
@@ -15,9 +19,9 @@ def read_markets(market_fp=None):
 
 
 def find_bundle(json_obj, market_name, expiry_date_str):
-    bundle_value = json_obj[market_name]['bundle']
+    bundle_value = json_obj[market_name][BUNDLE]
 
-    if 'bundle_id' in bundle_value:
+    if BUNDLE_ID in bundle_value:
         return bundle_value
 
     return bundle_value[expiry_date_str]
@@ -26,14 +30,14 @@ def find_bundle(json_obj, market_name, expiry_date_str):
 def find_asset(json_obj, market_name, asset_name):
     expiry_str = asset_name[-4:]
     bundle_value = find_bundle(json_obj, market_name, expiry_str)
-    return bundle_value['assets'][asset_name]
+    return bundle_value[_ASSETS][asset_name]
 
 
 def active_markets(market_dict, active_date):
     # TODO(rheineke): Create bundle iterator?
     active_market_dict = {}
     for mkt_nm, mkt_dict in market_dict.items():
-        bundles_dict = mkt_dict['bundle']
+        bundles_dict = mkt_dict[BUNDLE]
         if _LIQUIDATION_DATE in bundles_dict:
             if _active_bundle(bundles_dict, active_date):
                 active_market_dict[mkt_nm] = mkt_dict

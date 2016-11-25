@@ -15,7 +15,7 @@ class ContractBundle:
         self.market = Market(market_name)
         self.expiration = expiration
         b = config.find_bundle(config.read_markets(), market_name, expiration)
-        self.id = int(b['bundle_id'])
+        self.id = int(b[config.BUNDLE_ID])
 
 
 class Contract:
