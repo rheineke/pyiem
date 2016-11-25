@@ -13,7 +13,7 @@ def read_and_write_quotes(now, loop):
 if __name__ == '__main__':
     # Publicly available data
     # Daily summary data
-    # hdf_store.retrieve_and_store_daily_data()
+    # recorder.retrieve_and_store_daily_data()
 
     # Quotes data
     loop = asyncio.get_event_loop()

@@ -12,6 +12,7 @@ from iem.contract import Market
 
 NAME = 'daily_price_history'
 
+
 def full_price_history_frame(mkt_id):
     return pd.concat(full_price_history_frames(mkt_id))
 
@@ -19,9 +20,8 @@ def full_price_history_frame(mkt_id):
 def full_price_history_frames(mkt_id):
     month_year_iter = history_dates(mkt_id=mkt_id)
     dfs = []
-    for m, y in month_year_iter:
-        # TODO(rheineke): Handle future combinations
-        dfs.append(price_history_frame(mkt_id, m, y))
+    for y, m in month_year_iter:
+        dfs.append(price_history_frame(mkt_id, y, m))
     return dfs
 
 
@@ -32,12 +32,20 @@ def price_history_frame(mkt_id, year, month):
     response = requests.post(url=url, data=data)
     index_cols = [iem.DATE, iem.CONTRACT]
     kwargs = dict(header=0, parse_dates=[iem.DATE], index_col=index_cols)
-    dfs = pd.read_html(response.text, **kwargs)
+    try:
+        dfs = pd.read_html(response.text, **kwargs)
+    except ValueError:
+        dfs = [pd.DataFrame()]
 
     # Expect a singleton list
     assert len(dfs) == 1
 
-    return dfs[0]
+    # Remove duplicates, if any
+    df = dfs[0]
+    if len(df.index.unique()) != len(df.index):
+        df = df.groupby(level=df.index.names).first()
+
+    return df
 
 
 def history_dates(mkt_id):

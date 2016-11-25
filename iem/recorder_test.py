@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 import iem
+from iem import recorder
 
 
 class HFDStoreTest(unittest.TestCase):
@@ -26,5 +27,11 @@ class HFDStoreTest(unittest.TestCase):
         dedupe_idx = df.index.difference(df.index)
         iter_df = df.reindex(dedupe_idx)
         self.assertEqual(len(iter_df), 0)
+
+    def testUniqueIndex(self):
+        with recorder.open_store(mode='r') as store:
+            for key in store.keys():
+                df = store[key]
+                self.assertEqual(len(df.index.unique()), len(df.index), msg=key)
 
 

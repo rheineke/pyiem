@@ -4,9 +4,10 @@ import json
 import pandas as pd
 
 # Variables defined in configuration file but not explicitly on website
-_ASSETS = 'assets'
+ASSETS = 'assets'
 BUNDLE = 'bundle'
 BUNDLE_ID = 'bundle_id'
+EXPIRY_DATE = 'expiry_date'
 _LIQUIDATION_DATE = 'liquidation_date'
 
 
@@ -30,7 +31,7 @@ def find_bundle(json_obj, market_name, expiry_date_str):
 def find_asset(json_obj, market_name, asset_name):
     expiry_str = asset_name[-4:]
     bundle_value = find_bundle(json_obj, market_name, expiry_str)
-    return bundle_value[_ASSETS][asset_name]
+    return bundle_value[ASSETS][asset_name]
 
 
 def active_markets(market_dict, active_date):

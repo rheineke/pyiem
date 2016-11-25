@@ -14,31 +14,40 @@ def open_store(path=None, mode=None):
     return pd.HDFStore(path=path, mode=mode)
 
 
+def history_key(market):
+    return market.name + '_' + px_hist.NAME
+
+
+def quote_key(market):
+    return market.name + '_quotes'
+
+
 def retrieve_and_store_daily_data():
-    mkt_conf = config.read_markets()
-    for mkt_name in mkt_conf.keys():
+    now = pd.Timestamp.now()
+    active_mkts = config.active_markets(config.read_markets(), now)
+    for mkt_name in active_mkts.keys():
         print(mkt_name)
         mkt = contract.Market(mkt_name)
         mkt_id = mkt.id
         if mkt_name == 'FedPolicyB':
             px_hist_dfs = px_hist.full_price_history_frames(mkt_id)
+
             # FedPolicyB data cleaning
             # 2001/10 data has a warning about the contract type
-            df = px_hist_dfs[9]
-            tail_df = df.iloc[1:]
-            dt_lvl = tail_df.index.get_level_values(level=iem.DATE)
-            dt_idx = pd.to_datetime(dt_lvl)
-            contract_idx = tail_df.index.get_level_values(level=iem.CONTRACT)
-            levels = [dt_idx, contract_idx]
-            labels = tail_df.index.labels
-            multi_idx = pd.MultiIndex(levels=levels, labels=labels)
-            clean_df = tail_df.set_index(multi_idx)
-            px_hist_dfs[9] = clean_df
+            oct_2001_idx = 9
+            df = px_hist_dfs[oct_2001_idx]
+            tail_df = df.iloc[1:].reset_index()
+            tail_df[iem.DATE] = pd.to_datetime(tail_df[iem.DATE])
+            clean_df = tail_df.set_index([iem.DATE, iem.CONTRACT])
+            px_hist_dfs[oct_2001_idx] = clean_df
+
             px_hist_df = pd.concat(px_hist_dfs)
         else:
             px_hist_df = px_hist.full_price_history_frame(mkt_id)
+        # Fully lexsort dataframe for easier manipulation later
+        px_hist_df = px_hist_df.sort_index()
         with open_store() as hdf_store:
-            hdf_store[mkt_name + '_' + px_hist.NAME] = px_hist_df
+            hdf_store[history_key(market=mkt)] = px_hist_df
 
 
 def read_and_write_quotes(snapshot_date):
@@ -49,7 +58,7 @@ def read_and_write_quotes(snapshot_date):
         mkt = contract.Market(mkt_name)
         quotes_df = px_hist.read_quote_frame(mkt.id)
         with open_store() as hdf_store:
-            key = mkt_name + '_' + 'quotes'
+            key = quote_key(market=mkt)
             # TODO(rheineke): Do not assume table exists
             if key in hdf_store:
                 prev_df = hdf_store[key]
