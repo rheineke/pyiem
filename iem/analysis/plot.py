@@ -28,8 +28,11 @@ def expiry_date_series(expiry_str, *, expiry_date_json):
 
 
 def cumulative_units_frame(bundle_history_df):
-    units_df = bundle_history_df[iem.UNITS].unstack()
-    return units_df.cumsum()
+    return cumsum_frame(bundle_history_df[iem.UNITS])
+
+
+def cumsum_frame(bundle_history_srs):
+    return bundle_history_srs.unstack().cumsum()
 
 
 def bundle_slice(json_obj, market_name, expiry_date_str):
@@ -38,11 +41,11 @@ def bundle_slice(json_obj, market_name, expiry_date_str):
     return pd.IndexSlice[:, bundle_assets]
 
 
-def plot_cumulative_units(bundle_history_df):
-    cum_units_df = cumulative_units_frame(bundle_history_df)
+def plot_cumsum(bundle_history_srs):
+    cumsum_df = cumsum_frame(bundle_history_srs)
     # First trade index
-    fst_trade_idx = (cum_units_df.sum(axis=1) > 0).idxmax()
-    nonzero_cum_units_df = cum_units_df.loc[fst_trade_idx:]
+    fst_trade_idx = (cumsum_df.sum(axis=1) > 0).idxmax()
+    nonzero_cum_units_df = cumsum_df.loc[fst_trade_idx:]
     plt.figure(get_new_fignum())
     plt.plot(nonzero_cum_units_df)
     plt.show()
@@ -74,9 +77,11 @@ if __name__ == '__main__':
     bundle_df = df.loc[bundle_lbl]
 
     bundle_df = px_hist_df.loc[bundle_slice(mkts_json, mkt_name, bundle), :]
-    plot_cumulative_units(bundle_df)
+    # plot_cumsum(bundle_df[iem.UNITS])
+    plot_cumsum(bundle_df[iem.DOLLAR_VOLUME])
 
-    plot_cumulative_units(px_hist_df)
+    # plot_cumsum(px_hist_df[iem.UNITS])
+    plot_cumsum(px_hist_df[iem.DOLLAR_VOLUME])
 
     # gb = df.groupby([EXPIRY, iem.DATE])
     # agg_dict = {

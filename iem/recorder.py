@@ -23,9 +23,7 @@ def quote_key(market):
 
 
 def retrieve_and_store_daily_data():
-    now = pd.Timestamp.now()
-    active_mkts = config.active_markets(config.read_markets(), now)
-    for mkt_name in active_mkts.keys():
+    for mkt_name in config.read_markets().keys():
         print(mkt_name)
         mkt = contract.Market(mkt_name)
         mkt_id = mkt.id

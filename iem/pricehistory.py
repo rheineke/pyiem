@@ -78,11 +78,11 @@ def agg_frame(px_hist_df):
         iem.LOW_PX: np.min,
         iem.HIGH_PX: np.max,
         iem.UNITS: np.sum,
-        iem.DVOL: np.sum,
+        iem.DOLLAR_VOLUME: np.sum,
         iem.LST_PX: lambda s: s.ix[-1],
     }
     df = c_gb.agg(arg=agg_arg)
-    df[iem.AVG_PX] = df[iem.DVOL].div(df[iem.UNITS]).round(3)
+    df[iem.AVG_PX] = df[iem.DOLLAR_VOLUME].div(df[iem.UNITS]).round(3)
     return df
 
 
