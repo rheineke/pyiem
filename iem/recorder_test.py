@@ -9,11 +9,6 @@ from iem import recorder
 
 
 class HFDStoreTest(unittest.TestCase):
-    def testMkdir(self):
-        parent_path = Path('data/')
-        with self.assertRaises(FileExistsError):
-            parent_path.mkdir()
-
     def testDuplicateData(self):
         s = """Timestamp,Symbol,Bid,Ask,Last,Low,High,Average
         2016-11-19 06:45:00-06:00,FRup1216,0.9,0.95,0.95,,,
@@ -29,7 +24,8 @@ class HFDStoreTest(unittest.TestCase):
         self.assertEqual(len(iter_df), 0)
 
     def testUniqueIndex(self):
-        with recorder.open_store(mode='r') as store:
+
+        with recorder.open_store(mode='w') as store:
             for key in store.keys():
                 df = store[key]
                 self.assertEqual(len(df.index.unique()), len(df.index), msg=key)
