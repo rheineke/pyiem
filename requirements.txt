@@ -1,4 +1,5 @@
 ###### Requirements without Version Specifiers ######
+pytables
 pytest
 
 ###### Requirements with Version Specifiers ######
