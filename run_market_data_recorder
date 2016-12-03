@@ -2,7 +2,7 @@
 
 # Run unit tests
 printf "Running all unit tests..."
-nosetests
+pytest
 ERR=$?
 
 # Run market data recorder if unit tests passed
