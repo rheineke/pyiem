@@ -1,5 +1,4 @@
 ###### Requirements without Version Specifiers ######
-pytables
 pytest
 
 ###### Requirements with Version Specifiers ######
@@ -7,4 +6,5 @@ pytest
 # html5lib == 0.999  # Pandas complains if bad request
 lxml == 3.6.4
 pandas == 0.19.1
+pytables == 3.3.0
 requests == 2.12.1
