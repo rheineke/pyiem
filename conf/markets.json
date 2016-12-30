@@ -50,7 +50,7 @@
         },
         "bundle_id": 708,
         "expiry_date": "2016-12-14",
-        "liquidation_date": ""
+        "liquidation_date": "2016-12-14"
       },
       "0117": {
         "assets": {
@@ -61,18 +61,84 @@
         "bundle_id": 709,
         "expiry_date": "2017-02-01",
         "liquidation_date": ""
+      },
+      "0317": {
+        "assets": {
+          "FRup0317": {"id": 3062, "order": 310},
+          "FRsame0317": {"id": 3063, "order": 311},
+          "FRdown0317": {"id": 3064, "order": 312}
+        },
+        "bundle_id": 711,
+        "open_date": "2016-12-20",
+        "expiry_date": "2017-03-01",
+        "liquidation_date": ""
+      },
+      "0517": {
+        "assets": {
+          "FRup0517": {"id": 3065, "order": 313},
+          "FRsame0517": {"id": 3066, "order": 314},
+          "FRdown0517": {"id": 3067, "order": 315}
+        },
+        "bundle_id": 712,
+        "open_date": "2016-12-20",
+        "expiry_date": "2017-05-01",
+        "liquidation_date": ""
       }
+    }
+  },
+  "Congress18": {
+    "id": 369,
+    "bundle": {
+      "assets": {
+        "DH_DS18": {"id": 3074, "order": 322 },
+        "RH_DS18": {"id": 3075, "order": 323 },
+        "DH_RS18": {"id": 3076, "order": 324 },
+        "RH_RS18": {"id": 3077, "order": 325 },
+        "OTHER18": {"id": 3078, "order": 326 }
+      },
+      "bundle_id": 715,
+      "open_date": "2016-12-20",
+      "expiry_date": "2018-11-08",
+      "liquidation_date": ""
+    }
+  },
+  "House18": {
+    "id": 368,
+    "bundle": {
+      "assets": {
+        "RH.gain18": {"id": 3071, "order": 319 },
+        "RH.hold18": {"id": 3072, "order": 320 },
+        "RH.lose18": {"id": 3073, "order": 321 }
+      },
+      "bundle_id": 714,
+      "open_date": "2016-12-20",
+      "expiry_date": "2018-11-08",
+      "liquidation_date": ""
+    }
+  },
+  "Senate18": {
+    "id": 367,
+    "bundle": {
+      "assets": {
+        "RS.gain18": {"id": 3068, "order": 316 },
+        "RS.hold18": {"id": 3069, "order": 317 },
+        "RS.lose18": {"id": 3070, "order": 318 }
+      },
+      "bundle_id": 713,
+      "open_date": "2016-12-20",
+      "expiry_date": "2018-11-08",
+      "liquidation_date": ""
     }
   },
   "Congress16": {
     "id": 360,
     "bundle": {
       "assets": {
-        "DH_DS16": {"id": 3014, "order": 0 },
-        "RH_DS16": {"id": 3015, "order": 0 },
-        "DH_RS16": {"id": 3016, "order": 0 },
-        "RH_RS16": {"id": 3017, "order": 0 },
-        "OTHER16": {"id": 3018, "order": 0 }
+        "DH_DS16": {"id": 3014, "order": 268 },
+        "RH_DS16": {"id": 3015, "order": 269 },
+        "DH_RS16": {"id": 3016, "order": 270 },
+        "RH_RS16": {"id": 3017, "order": 271 },
+        "OTHER16": {"id": 3018, "order": 272 }
       },
       "bundle_id": 698,
       "expiry_date": "2016-11-08",

@@ -7,13 +7,20 @@ from iem import config
 
 class ConfigTest(unittest.TestCase):
     def testActiveMarkets(self):
-        mkt_conf = config.read_markets()
         ts = pd.Timestamp(year=2016, month=11, day=18)
+        self._active_markets(ts, 1, 2)
+
+    def testActiveMarketsEndOfYear(self):
+        ts = pd.Timestamp(year=2016, month=12, day=30)
+        self._active_markets(ts, 4, 3)
+
+    def _active_markets(self, ts, exp_num_active_markets, exp_num_fed_bundles):
+        mkt_conf = config.read_markets()
         active_mkt_conf = config.active_markets(mkt_conf, ts)
         fed = 'FedPolicyB'
-        self.assertEqual(len(active_mkt_conf), 1)
+        self.assertEqual(len(active_mkt_conf), exp_num_active_markets)
         self.assertTrue(fed in active_mkt_conf)
-        self.assertEqual(len(active_mkt_conf[fed]), 2)
+        self.assertEqual(len(active_mkt_conf[fed]), exp_num_fed_bundles)
 
     def testFindBundle(self):
         mkt_conf = config.read_markets()

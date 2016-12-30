@@ -8,6 +8,7 @@ ASSETS = 'assets'
 BUNDLE = 'bundle'
 BUNDLE_ID = 'bundle_id'
 EXPIRY_DATE = 'expiry_date'
+_OPEN_DATE = 'open_date'
 _LIQUIDATION_DATE = 'liquidation_date'
 
 
@@ -53,8 +54,17 @@ def active_markets(market_dict, active_date):
 
 
 def _active_bundle(bundle_dict, date):
+    # Date is after open date
+    if _OPEN_DATE in bundle_dict:
+        open_dt = pd.to_datetime(bundle_dict[_OPEN_DATE])
+    else:
+        open_dt = pd.NaT
+    opened_after = pd.isnull(open_dt) or open_dt <= date
+
+    # Date is before liquidation date
     liq_dt = pd.to_datetime(bundle_dict[_LIQUIDATION_DATE])
-    return pd.isnull(liq_dt) or liq_dt >= date
+    liquidated_after = pd.isnull(liq_dt) or liq_dt >= date
+    return opened_after and liquidated_after
 
 
 def read_login():
