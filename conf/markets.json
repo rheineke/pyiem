@@ -100,7 +100,8 @@
       "open_date": "2016-12-20",
       "expiry_date": "2018-11-08",
       "liquidation_date": ""
-    }
+    },
+    "quotes_url": "Congress18_quotes"
   },
   "House18": {
     "id": 368,
@@ -114,7 +115,8 @@
       "open_date": "2016-12-20",
       "expiry_date": "2018-11-08",
       "liquidation_date": ""
-    }
+    },
+    "quotes_url": "Congress18_quotes"
   },
   "Senate18": {
     "id": 367,
@@ -128,7 +130,8 @@
       "open_date": "2016-12-20",
       "expiry_date": "2018-11-08",
       "liquidation_date": ""
-    }
+    },
+    "quotes_url": "Congress18_quotes"
   },
   "Congress16": {
     "id": 360,

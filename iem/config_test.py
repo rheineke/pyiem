@@ -20,7 +20,8 @@ class ConfigTest(unittest.TestCase):
         fed = 'FedPolicyB'
         self.assertEqual(len(active_mkt_conf), exp_num_active_markets)
         self.assertTrue(fed in active_mkt_conf)
-        self.assertEqual(len(active_mkt_conf[fed]), exp_num_fed_bundles)
+        num_active_bundles = len(active_mkt_conf[fed][config.BUNDLE])
+        self.assertEqual(num_active_bundles, exp_num_fed_bundles)
 
     def testFindBundle(self):
         mkt_conf = config.read_markets()

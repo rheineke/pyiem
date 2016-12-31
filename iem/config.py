@@ -10,6 +10,7 @@ BUNDLE_ID = 'bundle_id'
 EXPIRY_DATE = 'expiry_date'
 _OPEN_DATE = 'open_date'
 _LIQUIDATION_DATE = 'liquidation_date'
+QUOTES_URL = 'quotes_url'
 
 
 def read_markets(market_fp=None):
@@ -49,7 +50,10 @@ def active_markets(market_dict, active_date):
                 if _active_bundle(bundle_dict, active_date):
                     active_bundles_dict[bundle_nm] = bundle_dict
             if len(active_bundles_dict):
-                active_market_dict[mkt_nm] = active_bundles_dict
+                active_market_dict[mkt_nm] = {
+                    'id': mkt_dict['id'],
+                    BUNDLE: active_bundles_dict
+                }
     return active_market_dict
 
 

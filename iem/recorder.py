@@ -1,3 +1,4 @@
+import pprint
 from pathlib import Path
 
 import pandas as pd
@@ -57,13 +58,20 @@ def retrieve_and_store_daily_data():
 def read_and_write_quotes(snapshot_date):
     mkt_conf = config.read_markets()
     active_mkt_conf = config.active_markets(mkt_conf, snapshot_date)
-    for mkt_name in active_mkt_conf.keys():
+    retrieved_markets = {}
+    for mkt_name, mkt_conf in active_mkt_conf.items():
         print('{}: retrieving {}. . . '.format(snapshot_date, mkt_name), end='')
         mkt = contract.Market(mkt_name)
-        quotes_df = px_hist.read_quote_frame(mkt.id)
+
+        # Market snapshot may have been retrieved already
+        if mkt_name not in retrieved_markets:
+            quotes_dfs = px_hist.read_quote_frames(mkt_conf)
+            retrieved_markets.update(quotes_dfs)
+
+        quotes_df = retrieved_markets[mkt_name]
+
         with open_store() as hdf_store:
             key = quote_key(market=mkt)
-            # TODO(rheineke): Do not assume table exists
             if key in hdf_store:
                 prev_df = hdf_store[key]
                 dedupe_idx = quotes_df.index.difference(prev_df.index)
