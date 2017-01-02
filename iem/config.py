@@ -1,6 +1,7 @@
 """Convenience functions that perform I/O to read local configuration files"""
 import json
 
+import collections
 import pandas as pd
 
 # Variables defined in configuration file but not explicitly on website
@@ -8,8 +9,8 @@ ASSETS = 'assets'
 BUNDLE = 'bundle'
 BUNDLE_ID = 'bundle_id'
 EXPIRY_DATE = 'expiry_date'
-_OPEN_DATE = 'open_date'
-_LIQUIDATION_DATE = 'liquidation_date'
+OPEN_DATE = 'open_date'
+LIQUIDATION_DATE = 'liquidation_date'
 QUOTES_URL = 'quotes_url'
 
 
@@ -17,7 +18,7 @@ def read_markets(market_fp=None):
     if market_fp is None:
         market_fp = 'conf/markets.json'
     with open(market_fp) as fp:
-        mkts = json.load(fp)
+        mkts = json.load(fp, object_hook=collections.OrderedDict)
     return mkts
 
 
@@ -41,7 +42,7 @@ def active_markets(market_dict, active_date):
     active_market_dict = {}
     for mkt_nm, mkt_dict in market_dict.items():
         bundles_dict = mkt_dict[BUNDLE]
-        if _LIQUIDATION_DATE in bundles_dict:
+        if LIQUIDATION_DATE in bundles_dict:
             if _active_bundle(bundles_dict, active_date):
                 active_market_dict[mkt_nm] = mkt_dict
         else:  # Market contains multiple bundles
@@ -59,14 +60,14 @@ def active_markets(market_dict, active_date):
 
 def _active_bundle(bundle_dict, date):
     # Date is after open date
-    if _OPEN_DATE in bundle_dict:
-        open_dt = pd.to_datetime(bundle_dict[_OPEN_DATE])
+    if OPEN_DATE in bundle_dict:
+        open_dt = pd.to_datetime(bundle_dict[OPEN_DATE])
     else:
         open_dt = pd.NaT
     opened_after = pd.isnull(open_dt) or open_dt <= date
 
     # Date is before liquidation date
-    liq_dt = pd.to_datetime(bundle_dict[_LIQUIDATION_DATE])
+    liq_dt = pd.to_datetime(bundle_dict[LIQUIDATION_DATE])
     liquidated_after = pd.isnull(liq_dt) or liq_dt >= date
     return opened_after and liquidated_after
 

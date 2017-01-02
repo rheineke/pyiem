@@ -14,8 +14,7 @@ def store_path(path=None):
 
 
 def open_store(path=None, mode=None):
-    if path is None:
-        store_p = store_path(path)
+    store_p = store_path(path)
     parent_path = store_p.parent
     parent_path.mkdir(parents=False, exist_ok=True)
     return pd.HDFStore(path=store_p.as_posix(), mode=mode)

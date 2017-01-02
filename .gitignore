@@ -12,3 +12,6 @@ ipsh.py
 # Configuration files
 conf/
 data/
+
+# OS specific files
+.DS_Store
