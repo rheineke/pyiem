@@ -12,16 +12,23 @@ python:
   - "3.6-dev" # 3.6 development branch
   - "nightly" # currently points to 3.7-dev
 
+# http://stackoverflow.com/questions/30588634/install-numpy-1-8-in-travis-ci
 before_install:
-  - sudo apt-get -y install python3-pip python-dev
-  - sudo pip3 install -U setuptools
-  - sudo pip3 install -U virtualenvwrapper
-  - python3 -V
-  - pip3 -V
+  - travis_retry wget http://repo.continuum.io/miniconda/Miniconda3-4.2.12-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+  - python -V
+  - pip -V
 
 # command to install dependencies
 install:
-  - sudo pip3 install -r requirements.txt
+  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
+  - source activate test
+  - conda install --yes --file requirements.txt
+  - pip install setuptools
+  - python setup.py install
 
 # command to run tests
 script: pytest

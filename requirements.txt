@@ -5,6 +5,8 @@ pytest
 #   See https://www.python.org/dev/peps/pep-0440/#version-specifiers
 # html5lib == 0.999  # Pandas complains if bad request
 lxml == 3.6.4
+numpy == 1.11.2
 pandas == 0.19.2
+pip == 9.0.1
 requests == 2.12.4
 tables == 3.3.0
