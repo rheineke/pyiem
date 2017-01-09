@@ -9,4 +9,5 @@ numpy == 1.11.2
 pandas == 0.19.2
 pip == 9.0.1
 requests == 2.12.4
-tables == 3.3.0
+# pytables in conda == tables in pip
+pytables == 3.3.0
