@@ -1,12 +1,6 @@
-from collections import defaultdict
-from urllib.parse import parse_qs
-
-import itertools
-from lxml import etree
 import pandas as pd
 
 import iem
-from iem import session
 
 table_text = """
 <table id="data-table" class="table table-striped form-table jumbotronTable" aria-describedby="Trader activity table">
@@ -41,11 +35,13 @@ table_text = """
 </table>
 """
 
-if __name__ == '__main__':
+
+def main():
     date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
     kwargs = dict(index_col=iem.ORDER_DATE, parse_dates=date_cols)
     dfs = pd.read_html(table_text, **kwargs)
     df = dfs[0]
 
+    oid_df = pd.DataFrame()
     cxl_o = iem.CANCEL_ORDER
     df[cxl_o] = df[cxl_o].combine_first(oid_df[cxl_o])
