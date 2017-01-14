@@ -8,9 +8,9 @@ python:
   - "2.7"
   - "3.4"
   - "3.5"
-  - "3.5-dev" # 3.5 development branch
-  - "3.6-dev" # 3.6 development branch
-  - "nightly" # currently points to 3.7-dev
+  # - "3.5-dev" # 3.5 development branch
+  # - "3.6-dev" # 3.6 development branch
+  # - "nightly" # currently points to 3.7-dev
 
 # http://stackoverflow.com/questions/30588634/install-numpy-1-8-in-travis-ci
 before_install:
@@ -27,6 +27,7 @@ install:
   - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
   - source activate test
   - conda install --yes --file requirements.txt
+  - conda install --yes --file futures_requirements.txt
   - pip install setuptools
 
 # command to run tests
