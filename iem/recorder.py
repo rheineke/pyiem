@@ -1,4 +1,9 @@
-import pprint
+"""
+Record daily historical data and 15 minute market snapshots in an HDF store
+"""
+# Python 2 and 3:
+from __future__ import print_function
+
 from pathlib import Path
 
 import pandas as pd
@@ -17,6 +22,8 @@ def open_store(path=None, mode=None):
     store_p = store_path(path)
     parent_path = store_p.parent
     parent_path.mkdir(parents=False, exist_ok=True)
+    # Add to HDFStore arguments if size becomes an issue
+    # , complevel=9, complib='zlib'
     return pd.HDFStore(path=store_p.as_posix(), mode=mode)
 
 
@@ -29,6 +36,13 @@ def quote_key(market):
 
 
 def retrieve_and_store_daily_data():
+    """
+    For each market in the markets config file, retrieve the daily snapshots
+    from the IEM site. Previous daily snapshot data for that market is
+    overwritten in the process
+
+    :return: None
+    """
     for mkt_name in config.read_markets().keys():
         print(mkt_name)
         mkt = contract.Market(mkt_name)
@@ -48,10 +62,12 @@ def retrieve_and_store_daily_data():
             px_hist_df = pd.concat(px_hist_dfs)
         else:
             px_hist_df = px_hist.full_price_history_frame(mkt_id)
+
         # Fully lexsort dataframe for easier manipulation later
         px_hist_df = px_hist_df.sort_index()
-        with open_store() as hdf_store:
-            hdf_store[history_key(market=mkt)] = px_hist_df
+        with open_store(mode='a') as hdf_store:
+            key = history_key(market=mkt)
+            hdf_store.put(key=key, value=px_hist_df, format='t')
 
 
 def read_and_write_quotes(snapshot_date):
@@ -69,7 +85,7 @@ def read_and_write_quotes(snapshot_date):
 
         quotes_df = retrieved_markets[mkt_name]
 
-        with open_store() as hdf_store:
+        with open_store(mode='a') as hdf_store:
             key = quote_key(market=mkt)
             if key in hdf_store:
                 prev_df = hdf_store[key]

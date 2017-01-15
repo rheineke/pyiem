@@ -6,7 +6,7 @@ language: python
 
 python:
   - "2.7"
-  - "3.4"
+  # - "3.4"
   - "3.5"
   # - "3.5-dev" # 3.5 development branch
   # - "3.6-dev" # 3.6 development branch
@@ -27,6 +27,7 @@ install:
   - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
   - source activate test
   - conda install --yes --file requirements.txt
+  - conda list
   - pip install -r futures_requirements.txt
   - pip install setuptools
 

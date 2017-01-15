@@ -24,10 +24,17 @@ class HFDStoreTest(unittest.TestCase):
         self.assertEqual(len(iter_df), 0)
 
     def testUniqueIndex(self):
-
-        with recorder.open_store(mode='w') as store:
+        with recorder.open_store(mode='r') as store:
             for key in store.keys():
                 df = store[key]
                 self.assertEqual(len(df.index.unique()), len(df.index), msg=key)
+
+    def testAppend(self):
+        path = 'data/test.hdf'
+
+        # First open and close
+        fst_df = pd.DataFrame(data={'a': [0, 1], 'b': [2, 3]})
+        with recorder.open_store(path) as hdf_store:
+            hdf_store['fst'] = fst_df
 
 

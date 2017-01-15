@@ -1,5 +1,8 @@
 """Iowa Electronic Markets session. All queries requiring login credentials are
 handled by the session object"""
+# Python 2 and 3:
+from __future__ import print_function
+
 from collections import defaultdict
 
 from lxml import etree
