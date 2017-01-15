@@ -24,7 +24,7 @@ class HFDStoreTest(unittest.TestCase):
         self.assertEqual(len(iter_df), 0)
 
     def testUniqueIndex(self):
-        with recorder.open_store(mode='r') as store:
+        with recorder.open_store(mode='a') as store:
             for key in store.keys():
                 df = store[key]
                 self.assertEqual(len(df.index.unique()), len(df.index), msg=key)

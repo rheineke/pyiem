@@ -1,3 +1,5 @@
+from builtins import super
+
 from enum import Enum, unique
 
 import numpy as np
