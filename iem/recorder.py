@@ -4,6 +4,7 @@ Record daily historical data and 15 minute market snapshots in an HDF store
 # Python 2 and 3:
 from __future__ import print_function
 
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -21,7 +22,13 @@ def store_path(path=None):
 def open_store(path=None, mode=None):
     store_p = store_path(path)
     parent_path = store_p.parent
-    parent_path.mkdir(parents=False, exist_ok=True)
+    # Since Python 3.5, we can request nested existing directories directly from
+    # path-like object without exception
+    # parent_path.mkdir(parents=False, exist_ok=True)
+    try:
+        os.makedirs(parent_path.as_posix())
+    except OSError:
+        pass
     # Add to HDFStore arguments if size becomes an issue
     # , complevel=9, complib='zlib'
     return pd.HDFStore(path=store_p.as_posix(), mode=mode)
