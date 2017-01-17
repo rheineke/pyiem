@@ -54,4 +54,4 @@ class Side(Enum):
     #     return 'buy' if self == self.BUY else 'sell'
 
     def __str__(self):
-        return 'buy' if self is self.BUY else 'sell'
+        return 'buy' if self is Side.BUY else 'sell'
