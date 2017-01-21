@@ -22,11 +22,11 @@ elif [[ $TRAVIS_OS_NAME == 'linux' ]]; then
     case "${TOXENV}" in
         py27)
             # Install some custom Python 2 requirements on Linux 64
-            INSTALLER = 'Miniconda2-4.2.12-Linux-x86_64.sh'
+            INSTALLER='Miniconda2-4.2.12-Linux-x86_64.sh'
             ;;
         *)
             # Install some custom Python 3 requirements on Linux 64
-            INSTALLER = 'Miniconda3-4.2.12-Linux-x86_64.sh'
+            INSTALLER='Miniconda3-4.2.12-Linux-x86_64.sh'
             ;;
     esac
 
