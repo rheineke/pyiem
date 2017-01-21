@@ -39,9 +39,3 @@ MINICONDA_INSTALLER_URL="${MINICONDA_INSTALLER_BASE_URL}${INSTALLER}"
 echo $MINICONDA_INSTALLER_URL
 
 wget $MINICONDA_INSTALLER_URL -O miniconda.sh
-chmod +x miniconda.sh
-bash miniconda.sh -b -p $HOME/miniconda
-export PATH=/home/travis/miniconda/bin:$PATH
-conda update --yes conda
-python -V
-pip -V

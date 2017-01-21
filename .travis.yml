@@ -25,7 +25,13 @@ python:
 
 # http://stackoverflow.com/questions/30588634/install-numpy-1-8-in-travis-ci
 before_install:
-  - ./.travis/before_install.sh
+  - ./.travis/wget_miniconda.sh
+  - chmod +x miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
+  - python -V
+  - pip -V
 
 # command to install dependencies
 install:
