@@ -1,27 +1,29 @@
-# matrix:
-#   include:
-#     - os: linux
-#       dist: xenial
-#       sudo: required
-#     - os: osx
-#       osx_image: xcode8.2
-#   allow_failures:
-#     - os: osx
-
-os: linux
-dist: xenial
-sudo: required
-
 language: python
 
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  # - "3.5-dev" # 3.5 development branch
-  # - "3.6-dev" # 3.6 development branch
-  # - "nightly" # currently points to 3.7-dev
+matrix:
+  include:
+#    - os: linux
+#      dist: xenial
+#      python: 2.7
+#      sudo: required
+    - os: linux
+      dist: xenial
+      python: 3.4
+      sudo: required
+    - os: linux
+      dist: xenial
+      python: 3.5
+      sudo: required
+    - os: linux
+      dist: xenial
+      python: 3.6
+      sudo: required
+    - os: osx
+      osx_image: xcode8.2
+      python: 3.6
+      sudo: required
+  allow_failures:
+    - os: osx
 
 # http://stackoverflow.com/questions/30588634/install-numpy-1-8-in-travis-ci
 before_install:
