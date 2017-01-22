@@ -1,4 +1,4 @@
-from builtins import super
+from builtins import dict, object, super
 
 from enum import Enum, unique
 
@@ -22,7 +22,7 @@ def to_string(expiration):
     return '{:%Y-%m-%d %I:%M %p}'.format(expiration)
 
 
-class PriceTimeLimit:
+class PriceTimeLimit(object):
     def __init__(self, price=np.nan, expiration=pd.NaT):
         self.price = price
         self.expiration = expiration
@@ -39,7 +39,7 @@ class Counterparty(Enum):
     Participant = 1
 
 
-class Order:
+class Order(object):
     def __init__(self, side, quantity, price_time_limit, counterparty):
         self.side = side
         self.quantity = quantity

@@ -1,6 +1,8 @@
+from future import standard_library
+standard_library.install_aliases()
+
 import unittest
-from io import StringIO
-from pathlib import Path
+from io import StringIO  # for handling unicode strings
 
 import pandas as pd
 
