@@ -1,5 +1,4 @@
-from future import standard_library
-standard_library.install_aliases()
+from builtins import str
 
 import unittest
 from io import StringIO  # for handling unicode strings
@@ -12,7 +11,7 @@ from iem import recorder
 
 class HFDStoreTest(unittest.TestCase):
     def testDuplicateData(self):
-        s = """Timestamp,Symbol,Bid,Ask,Last,Low,High,Average
+        s = u"""Timestamp,Symbol,Bid,Ask,Last,Low,High,Average
         2016-11-19 06:45:00-06:00,FRup1216,0.9,0.95,0.95,,,
         2016-11-19 06:45:00-06:00,FRsame1216,0.07,0.125,0.061,,,
         2016-11-19 06:45:00-06:00,FRdown1216,0.0,0.001,0.002,,,

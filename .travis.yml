@@ -20,7 +20,7 @@ matrix:
       sudo: required
     - os: osx
       osx_image: xcode8.2
-      python: 3.5
+      python: 3.4
       sudo: required
   allow_failures:
     - os: osx
