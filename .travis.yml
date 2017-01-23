@@ -18,12 +18,14 @@ matrix:
       dist: xenial
       python: 3.6
       sudo: required
-    - os: osx
-      osx_image: xcode8.2
-      python: 2.7
-      sudo: required
-  allow_failures:
-    - os: osx
+#    As of 01/22/2017, "Python builds are not available on the OSX environment."
+#    https://docs.travis-ci.com/user/languages/python/
+#    - os: osx
+#      osx_image: xcode8.2
+#      python: 2.7
+#      sudo: required
+#  allow_failures:
+#    - os: osx
 
 before_install:
   - ./.travis/wget_miniconda.sh
