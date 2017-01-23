@@ -13,17 +13,17 @@ def read_and_write_quotes(now, loop):
 if __name__ == '__main__':
     # Publicly available data
     # Daily summary data
-    recorder.retrieve_and_store_daily_data()
+    # recorder.retrieve_and_store_daily_data()
 
     # Quotes data
-    # loop = asyncio.get_event_loop()
+    loop = asyncio.get_event_loop()
 
     # Schedule a call to retrieve quotes and store them
-    # loop.call_soon(read_and_write_quotes, pd.Timestamp.now(), loop)
+    loop.call_soon(read_and_write_quotes, pd.Timestamp.now(), loop)
 
     # Blocking call interrupted by loop.stop()
-    # loop.run_forever()
-    # loop.close()
+    loop.run_forever()
+    loop.close()
 
     # store = recorder.open_store(mode='r')
     # quotes_hist_df = store['FedPolicyB_quotes']

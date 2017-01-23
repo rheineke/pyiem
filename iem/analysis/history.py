@@ -1,7 +1,7 @@
 """Information that can be retrieved from daily historical data"""
 
 import iem
-from iem import config, recorder
+from iem import config, pricehistory as px_hist, recorder
 
 
 def contract_dates_frame(daily_price_history_df):
@@ -25,7 +25,7 @@ def contract_dates_frame(daily_price_history_df):
 def _table_names(store):
     names = []
     for k in store.keys():
-        if 'daily_price_history' not in k:
+        if px_hist.NAME not in k:
             continue
         names.append(k[1:])
     return names
