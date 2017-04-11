@@ -1,5 +1,5 @@
 ###### Requirements without Version Specifiers ######
-future
+future == 0.16.0
 pytest
 
 ###### Requirements with Version Specifiers ######
