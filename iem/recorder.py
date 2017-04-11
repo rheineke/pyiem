@@ -51,30 +51,42 @@ def retrieve_and_store_daily_data():
     :return: None
     """
     for mkt_name in config.read_markets().keys():
-        print(mkt_name)
         mkt = contract.Market(mkt_name)
-        mkt_id = mkt.id
-        if mkt_name == 'FedPolicyB':
-            px_hist_dfs = px_hist.full_price_history_frames(mkt_id)
+        px_hist_df = read_daily_market_data(mkt_name)
 
-            # FedPolicyB data cleaning
-            # 2001/10 data has a warning about the contract type
-            oct_2001_idx = 9
-            df = px_hist_dfs[oct_2001_idx]
-            tail_df = df.iloc[1:].reset_index()
-            tail_df[iem.DATE] = pd.to_datetime(tail_df[iem.DATE])
-            clean_df = tail_df.set_index([iem.DATE, iem.CONTRACT])
-            px_hist_dfs[oct_2001_idx] = clean_df
-
-            px_hist_df = pd.concat(px_hist_dfs)
-        else:
-            px_hist_df = px_hist.full_price_history_frame(mkt_id)
-
-        # Fully lexsort dataframe for easier manipulation later
-        px_hist_df = px_hist_df.sort_index()
         with open_store(mode='a') as hdf_store:
             key = history_key(market=mkt)
             hdf_store.put(key=key, value=px_hist_df, format='t')
+
+
+def read_daily_market_data(market):
+    """
+    Read the daily snapshots from the IEM website.
+
+    :param market: 
+    :return: 
+    """
+    print(market.name)
+    if market.name == 'FedPolicyB':
+        px_hist_dfs = px_hist.full_price_history_frames(mkt_id)
+
+        # FedPolicyB data cleaning
+        # 2001/10 data has a warning about the contract type
+        oct_2001_idx = 9
+        df = px_hist_dfs[oct_2001_idx]
+        tail_df = df.iloc[1:].reset_index()
+        tail_df[iem.DATE] = pd.to_datetime(tail_df[iem.DATE])
+        clean_df = tail_df.set_index([iem.DATE, iem.CONTRACT])
+        px_hist_dfs[oct_2001_idx] = clean_df
+
+        px_hist_df = pd.concat(px_hist_dfs)
+    else:
+        px_hist_df = px_hist.full_price_history_frame(market.id)
+
+    # Fully lexsort dataframe for easier manipulation later
+    px_hist_df = px_hist_df.sort_index()
+
+    return px_hist_df
 
 
 def read_and_write_quotes(snapshot_date):
