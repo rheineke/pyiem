@@ -8,9 +8,18 @@ import os
 from pathlib import Path
 
 import pandas as pd
+import sqlalchemy as sa
 
 import iem
 from iem import config, contract, pricehistory as px_hist
+
+
+def daily_market_table():
+    return sa.Table()
+
+
+def quotes_table():
+    return sa.Table()
 
 
 def store_path(path=None):
