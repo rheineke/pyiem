@@ -15,7 +15,21 @@ from iem import config, contract, pricehistory as px_hist
 
 
 def daily_market_table():
-    return sa.Table()
+    # Index columns
+    date_col = sa.Column('Date', sa.DATETIME, nullable=False)
+    contract_col = sa.Column('Contract', sa.CHAR(7), nullable=False)
+
+    return sa.Table(
+        date_col,
+        contract_col,
+        sa.Column('Units', sa.INTEGER, nullable=False),
+        sa.Column('$Volume', sa.DECIMAL, nullable=False),
+        sa.Column('LowPrice', sa.DECIMAL, nullable=False),
+        sa.Column('HighPrice', sa.DECIMAL, nullable=False),
+        sa.Column('AvgPrice', sa.DECIMAL, nullable=False),
+        sa.Column('LastPrice', sa.DECIMAL, nullable=True),  # Null == NaN?
+        sa.Index('idx', (date_col, contract_col), unique=True)
+    )
 
 
 def quotes_table():
@@ -77,7 +91,7 @@ def read_daily_market_data(market):
     """
     print(market.name)
     if market.name == 'FedPolicyB':
-        px_hist_dfs = px_hist.full_price_history_frames(mkt_id)
+        px_hist_dfs = px_hist.full_price_history_frames(market.id)
 
         # FedPolicyB data cleaning
         # 2001/10 data has a warning about the contract type
