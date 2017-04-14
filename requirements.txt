@@ -1,5 +1,5 @@
 ###### Requirements without Version Specifiers ######
-future == 0.16.0
+future
 pytest
 
 ###### Requirements with Version Specifiers ######
@@ -9,6 +9,7 @@ lxml == 3.7.2
 numpy == 1.11.3
 pandas == 0.19.2
 pip == 9.0.1
-requests == 2.12.4
 # pytables in conda == tables in pip
 pytables == 3.3.0
+requests == 2.12.4
+sqlalchemy == 1.1.5
