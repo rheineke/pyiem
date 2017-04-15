@@ -14,26 +14,54 @@ import iem
 from iem import config, contract, pricehistory as px_hist
 
 
-def daily_market_table():
+def daily_market_table(metadata):
     # Index columns
     date_col = sa.Column('Date', sa.DATETIME, nullable=False)
-    contract_col = sa.Column('Contract', sa.CHAR(7), nullable=False)
+    asset_col = sa.Column(
+        config.ASSET_ID,
+        sa.INTEGER,
+        sa.ForeignKey('assets.id'),
+        nullable=False
+    )
 
     return sa.Table(
+        'daily_market',
+        metadata,
         date_col,
-        contract_col,
+        asset_col,
         sa.Column('Units', sa.INTEGER, nullable=False),
-        sa.Column('$Volume', sa.DECIMAL, nullable=False),
-        sa.Column('LowPrice', sa.DECIMAL, nullable=False),
-        sa.Column('HighPrice', sa.DECIMAL, nullable=False),
+        sa.Column('$Volume', sa.INTEGER, nullable=False),
+        sa.Column('LowPrice', sa.INTEGER, nullable=False),
+        sa.Column('HighPrice', sa.INTEGER, nullable=False),
         sa.Column('AvgPrice', sa.DECIMAL, nullable=False),
-        sa.Column('LastPrice', sa.DECIMAL, nullable=True),  # Null == NaN?
-        sa.Index('idx', (date_col, contract_col), unique=True)
+        sa.Column('LastPrice', sa.INTEGER, nullable=True),  # Null == NaN?
+        sa.Index('idx', (date_col, asset_col), unique=True),
     )
 
 
-def quotes_table():
-    return sa.Table()
+def quotes_table(metadata):
+    # Index columns
+    ts_col = sa.Column('Timestamp', sa.TIMESTAMP, nullable=False)
+    asset_col = sa.Column(
+        config.ASSET_ID,
+        sa.INTEGER,
+        sa.ForeignKey('assets.id'),
+        nullable=False
+    )
+
+    return sa.Table(
+        'quotes',
+        metadata,
+        ts_col,
+        asset_col,
+        sa.Column('Bid', sa.INTEGER, nullable=False),  # No example of nullable
+        sa.Column('Ask', sa.INTEGER, nullable=False),
+        sa.Column('Last', sa.INTEGER, nullable=False),
+        sa.Column('Low', sa.INTEGER, nullable=True),
+        sa.Column('High', sa.INTEGER, nullable=True),
+        sa.Column('Average', sa.DECIMAL, nullable=True),
+        sa.Index('idx', (ts_col, asset_col), unique=True),
+    )
 
 
 def store_path(path=None):

@@ -13,3 +13,11 @@ pip == 9.0.1
 pytables == 3.3.0
 requests == 2.12.4
 sqlalchemy == 1.1.5
+
+# Alembic command line utility may not install. Anaconda creates:
+#!/Users/rheineke/anaconda3/bin/python
+# if __name__ == '__main__':
+#     import sys
+#     import alembic.config
+#
+#     sys.exit(alembic.config.main())
