@@ -13,6 +13,9 @@ import sqlalchemy as sa
 import iem
 from iem import config, contract, pricehistory as px_hist
 
+DAILY_MARKET = 'daily_market'
+QUOTES = 'quotes'
+
 
 def daily_market_table(metadata):
     # Index columns
@@ -20,12 +23,12 @@ def daily_market_table(metadata):
     asset_col = sa.Column(
         config.ASSET_ID,
         sa.INTEGER,
-        sa.ForeignKey('assets.id'),
+        sa.ForeignKey(config.ASSETS + '.' + config.ID),
         nullable=False
     )
 
     return sa.Table(
-        'daily_market',
+        DAILY_MARKET,
         metadata,
         date_col,
         asset_col,
@@ -35,7 +38,7 @@ def daily_market_table(metadata):
         sa.Column('HighPrice', sa.INTEGER, nullable=False),
         sa.Column('AvgPrice', sa.DECIMAL, nullable=False),
         sa.Column('LastPrice', sa.INTEGER, nullable=True),  # Null == NaN?
-        sa.Index('idx', (date_col, asset_col), unique=True),
+        sa.Index('idx', asset_col, date_col, unique=True),
     )
 
 
@@ -45,12 +48,12 @@ def quotes_table(metadata):
     asset_col = sa.Column(
         config.ASSET_ID,
         sa.INTEGER,
-        sa.ForeignKey('assets.id'),
+        sa.ForeignKey(config.ASSETS + '.' + config.ID),
         nullable=False
     )
 
     return sa.Table(
-        'quotes',
+        QUOTES,
         metadata,
         ts_col,
         asset_col,
@@ -60,7 +63,7 @@ def quotes_table(metadata):
         sa.Column('Low', sa.INTEGER, nullable=True),
         sa.Column('High', sa.INTEGER, nullable=True),
         sa.Column('Average', sa.DECIMAL, nullable=True),
-        sa.Index('idx', (ts_col, asset_col), unique=True),
+        sa.Index('idx', asset_col, ts_col, unique=True),
     )
 
 

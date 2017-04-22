@@ -4,7 +4,7 @@ from collections import OrderedDict
 import pandas as pd
 import sqlalchemy as sa
 
-from iem import config
+from iem import config, recorder
 
 
 def create_all(engine):
@@ -47,6 +47,8 @@ if __name__ == '__main__':
     mkt_table = config.markets_table(metadata)
     bundles_table = config.bundles_table(metadata)
     assets_table = config.assets_table(metadata)
+    daily_mkt_table = recorder.daily_market_table(metadata)
+    quotes_table = recorder.quotes_table(metadata)
     metadata.create_all(engine)
 
     # Query market table. Does metadata drop and create the table?
@@ -91,7 +93,9 @@ if __name__ == '__main__':
 
     asset_df = pd.DataFrame(data=asset_data).set_index(config.ID)
     asset_df = asset_df.sort_index()
-    asset_df.to_sql(config.ASSETS, **sql_kwargs)
+    # asset_df.to_sql(config.ASSETS, **sql_kwargs)
 
     db_asset_df = pd.read_sql_table(config.ASSETS, engine, index_col=config.ID)
+
+    # Daily market quotes
 
