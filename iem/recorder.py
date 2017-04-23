@@ -17,7 +17,8 @@ DAILY_MARKET = 'daily_market'
 QUOTES = 'quotes'
 
 
-def daily_market_table(metadata):
+def daily_market_table(metadata, market):
+    table_name = history_key(market)
     # Index columns
     date_col = sa.Column('Date', sa.DATETIME, nullable=False)
     asset_col = sa.Column(
@@ -28,7 +29,7 @@ def daily_market_table(metadata):
     )
 
     return sa.Table(
-        DAILY_MARKET,
+        table_name,
         metadata,
         date_col,
         asset_col,
@@ -42,7 +43,9 @@ def daily_market_table(metadata):
     )
 
 
-def quotes_table(metadata):
+def quotes_table(metadata, market):
+    table_name = quote_key(market)
+
     # Index columns
     ts_col = sa.Column('Timestamp', sa.TIMESTAMP, nullable=False)
     asset_col = sa.Column(
@@ -53,7 +56,7 @@ def quotes_table(metadata):
     )
 
     return sa.Table(
-        QUOTES,
+        table_name,
         metadata,
         ts_col,
         asset_col,

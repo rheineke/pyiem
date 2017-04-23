@@ -1,14 +1,69 @@
 import json
-from collections import OrderedDict
 
 import pandas as pd
 import sqlalchemy as sa
 
-from iem import config, recorder
+from iem import config, contract, recorder
 
 
-def create_all(engine):
-    pass
+def create_all(metadata, mkt_conf):
+    config.markets_table(metadata)
+    config.bundles_table(metadata)
+    config.assets_table(metadata)
+    recorder.daily_market_table(metadata)
+    recorder.quotes_table(metadata)
+
+    # Daily market quotes
+    mkts = [contract.Market(mkt_nm) for mkt_nm in mkt_conf.keys()]
+    for mkt in mkts:
+        recorder.daily_market_table(metadata, mkt)
+        recorder.quotes_table(metadata, mkt)
+
+
+def insert_config_data(engine):
+    # Market table data
+    mkt_names = list(mkt_conf.keys())
+    idx_data = [mkt_conf[nm][config.ID] for nm in mkt_names]
+    mkt_idx = pd.Index(data=idx_data, name=config.ID)
+    mkt_df = pd.DataFrame(data=mkt_names, columns=[config.NAME], index=mkt_idx)
+    mkt_df = mkt_df.sort_index()
+    sql_kwargs = dict(con=engine, if_exists='append')
+    # mkt_df.to_sql(config.MARKETS, **sql_kwargs)
+
+    # Query market table. Does metadata drop and create the table?
+    db_mkt_df = pd.read_sql_table(config.MARKETS, engine, index_col=config.ID)
+
+    # Bundles and assets table data
+    bundle_data = pd.compat.OrderedDefaultdict(list)
+    asset_data = pd.compat.OrderedDefaultdict(list)
+
+    for mkt_name, mkt_dict in mkt_conf.items():
+        mkt_id = mkt_dict[config.ID]
+
+        if config.BUNDLE_ID in mkt_dict[config.BUNDLE]:
+            bundle_dict = mkt_dict[config.BUNDLE]
+            append_bundle(bundle_data, mkt_id, bundle_dict)
+
+            bundle_id = bundle_dict[config.BUNDLE_ID]
+            append_assets(asset_data, bundle_id, bundle_dict[config.ASSETS])
+        else:
+            for bundle_name, bundle_dict in mkt_dict[config.BUNDLE].items():
+                append_bundle(bundle_data, mkt_id, bundle_dict)
+
+                bundle_id = bundle_dict[config.BUNDLE_ID]
+                append_assets(asset_data, bundle_id, bundle_dict[config.ASSETS])
+
+    bundle_df = pd.DataFrame(data=bundle_data).set_index(config.ID)
+    bundle_df = bundle_df.sort_index()
+    # bundle_df.to_sql(config.BUNDLES, **sql_kwargs)
+
+    db_bundle_df = pd.read_sql_table(config.BUNDLES, engine, index_col=config.ID)
+
+    asset_df = pd.DataFrame(data=asset_data).set_index(config.ID)
+    asset_df = asset_df.sort_index()
+    # asset_df.to_sql(config.ASSETS, **sql_kwargs)
+
+    db_asset_df = pd.read_sql_table(config.ASSETS, engine, index_col=config.ID)
 
 
 def append_bundle(bundle_data, mkt_id, bundle_dict):
@@ -44,58 +99,11 @@ if __name__ == '__main__':
     engine = sa.engine_from_config(db_conf)
 
     metadata = sa.MetaData()
-    mkt_table = config.markets_table(metadata)
-    bundles_table = config.bundles_table(metadata)
-    assets_table = config.assets_table(metadata)
-    daily_mkt_table = recorder.daily_market_table(metadata)
-    quotes_table = recorder.quotes_table(metadata)
+    create_all(metadata)
     metadata.create_all(engine)
-
-    # Query market table. Does metadata drop and create the table?
-    db_mkt_df = pd.read_sql_table(config.MARKETS, engine, index_col=config.ID)
 
     mkt_conf = config.read_markets()
 
-    # Market table data
-    mkt_names = list(mkt_conf.keys())
-    idx_data = [mkt_conf[nm][config.ID] for nm in mkt_names]
-    mkt_idx = pd.Index(data=idx_data, name=config.ID)
-    mkt_df = pd.DataFrame(data=mkt_names, columns=[config.NAME], index=mkt_idx)
-    mkt_df = mkt_df.sort_index()
-    sql_kwargs = dict(con=engine, if_exists='append')
-    # mkt_df.to_sql(config.MARKETS, **sql_kwargs)
+    insert_config_data(engine)
 
-    # Bundles and assets table data
-    bundle_data = pd.compat.OrderedDefaultdict(list)
-    asset_data = pd.compat.OrderedDefaultdict(list)
-
-    for mkt_name, mkt_dict in mkt_conf.items():
-        mkt_id = mkt_dict[config.ID]
-
-        if config.BUNDLE_ID in mkt_dict[config.BUNDLE]:
-            bundle_dict = mkt_dict[config.BUNDLE]
-            append_bundle(bundle_data, mkt_id, bundle_dict)
-
-            bundle_id = bundle_dict[config.BUNDLE_ID]
-            append_assets(asset_data, bundle_id, bundle_dict[config.ASSETS])
-        else:
-            for bundle_name, bundle_dict in mkt_dict[config.BUNDLE].items():
-                append_bundle(bundle_data, mkt_id, bundle_dict)
-
-                bundle_id = bundle_dict[config.BUNDLE_ID]
-                append_assets(asset_data, bundle_id, bundle_dict[config.ASSETS])
-
-    bundle_df = pd.DataFrame(data=bundle_data).set_index(config.ID)
-    bundle_df = bundle_df.sort_index()
-    # bundle_df.to_sql(config.BUNDLES, **sql_kwargs)
-
-    db_bundle_df = pd.read_sql_table(config.BUNDLES, engine, index_col=config.ID)
-
-    asset_df = pd.DataFrame(data=asset_data).set_index(config.ID)
-    asset_df = asset_df.sort_index()
-    # asset_df.to_sql(config.ASSETS, **sql_kwargs)
-
-    db_asset_df = pd.read_sql_table(config.ASSETS, engine, index_col=config.ID)
-
-    # Daily market quotes
-
+    # TODO: Populate data
