@@ -10,8 +10,6 @@ def create_all(metadata, mkt_conf):
     config.markets_table(metadata)
     config.bundles_table(metadata)
     config.assets_table(metadata)
-    recorder.daily_market_table(metadata)
-    recorder.quotes_table(metadata)
 
     # Daily market quotes
     mkts = [contract.Market(mkt_nm) for mkt_nm in mkt_conf.keys()]
@@ -29,9 +27,6 @@ def insert_config_data(engine):
     mkt_df = mkt_df.sort_index()
     sql_kwargs = dict(con=engine, if_exists='append')
     # mkt_df.to_sql(config.MARKETS, **sql_kwargs)
-
-    # Query market table. Does metadata drop and create the table?
-    db_mkt_df = pd.read_sql_table(config.MARKETS, engine, index_col=config.ID)
 
     # Bundles and assets table data
     bundle_data = pd.compat.OrderedDefaultdict(list)
@@ -57,13 +52,9 @@ def insert_config_data(engine):
     bundle_df = bundle_df.sort_index()
     # bundle_df.to_sql(config.BUNDLES, **sql_kwargs)
 
-    db_bundle_df = pd.read_sql_table(config.BUNDLES, engine, index_col=config.ID)
-
     asset_df = pd.DataFrame(data=asset_data).set_index(config.ID)
     asset_df = asset_df.sort_index()
     # asset_df.to_sql(config.ASSETS, **sql_kwargs)
-
-    db_asset_df = pd.read_sql_table(config.ASSETS, engine, index_col=config.ID)
 
 
 def append_bundle(bundle_data, mkt_id, bundle_dict):
@@ -99,11 +90,15 @@ if __name__ == '__main__':
     engine = sa.engine_from_config(db_conf)
 
     metadata = sa.MetaData()
-    create_all(metadata)
+    mkt_conf = config.read_markets()
+    create_all(metadata, mkt_conf)
     metadata.create_all(engine)
 
-    mkt_conf = config.read_markets()
-
     insert_config_data(engine)
+
+    # Query market table. Does metadata drop and create the table?
+    db_mkt_df = pd.read_sql_table(config.MARKETS, engine, index_col=config.ID)
+    db_bundle_df = pd.read_sql_table(config.BUNDLES, engine, index_col=config.ID)
+    db_asset_df = pd.read_sql_table(config.ASSETS, engine, index_col=config.ID)
 
     # TODO: Populate data
