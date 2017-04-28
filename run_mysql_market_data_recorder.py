@@ -102,3 +102,8 @@ if __name__ == '__main__':
     db_asset_df = pd.read_sql_table(config.ASSETS, engine, index_col=config.ID)
 
     # TODO: Populate data
+    markets = [contract.Market(mkt_nm) for mkt_nm in mkt_conf.keys()]
+    with recorder.open_store('data/hist_iem.hdf') as hdf_store:
+        for market in markets:
+            mkt_hist_key = recorder.history_key(market)
+            mkt_hist_df = hdf_store[mkt_hist_key]
