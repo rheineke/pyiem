@@ -5,14 +5,14 @@ pytest
 ###### Requirements with Version Specifiers ######
 #   See https://www.python.org/dev/peps/pep-0440/#version-specifiers
 # html5lib == 0.999  # Pandas complains if bad request
-lxml == 3.7.2
-numpy == 1.11.3
-pandas == 0.19.2
+lxml == 3.7.3
+numpy == 1.12.1
+pandas == 0.20.1
 pip == 9.0.1
 # pytables in conda == tables in pip
 pytables == 3.3.0
-requests == 2.12.4
-sqlalchemy == 1.1.5
+requests == 2.13.0
+sqlalchemy == 1.1.9
 
 # Alembic command line utility may not install. Anaconda creates:
 #!/Users/rheineke/anaconda3/bin/python
