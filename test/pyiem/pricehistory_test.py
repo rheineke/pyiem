@@ -3,7 +3,7 @@ import unittest
 import pandas as pd
 import pytz
 
-from iem import pricehistory as px_hist
+from src.pyiem import pricehistory as px_hist
 
 
 class PriceHistoryTest(unittest.TestCase):

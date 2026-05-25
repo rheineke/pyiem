@@ -1,0 +1,8 @@
+name: pyiem
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13.5
+  - pip
+  - pip:
+      - -e .        # installs your project via pyproject.toml

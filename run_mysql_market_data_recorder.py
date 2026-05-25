@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import sqlalchemy as sa
 
-from iem import config, contract, recorder
+from src.pyiem import contract, config, recorder
 
 
 def create_all(metadata, mkt_conf):

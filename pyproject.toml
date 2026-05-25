@@ -1,0 +1,17 @@
+[project]
+name = "pyiem"
+version = "0.1.0"
+requires-python = ">=3.13.5"
+dependencies = [
+    "pandas==2.3.3",
+]
+
+[project.optional-dependencies]
+dev = ["ipdb"]
+
+[project.scripts]
+dtc_member = "trading_firm_data.commands.dtc_member:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

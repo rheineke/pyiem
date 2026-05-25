@@ -1,12 +1,10 @@
-from builtins import str
-
 import unittest
 from io import StringIO  # for handling unicode strings
 
 import pandas as pd
 
-import iem
-from iem import recorder
+from src import pyiem
+from src.pyiem import recorder
 
 
 class HFDStoreTest(unittest.TestCase):
@@ -19,7 +17,7 @@ class HFDStoreTest(unittest.TestCase):
         2016-11-19 06:45:00-06:00,FRsame0117,0.525,0.895,0.519,,,
         2016-11-19 06:45:00-06:00,FRdown0117,0.002,0.003,0.002,,,
         """
-        df = pd.read_csv(StringIO(s), index_col=[iem.TIMESTAMP, iem.SYMBOL])
+        df = pd.read_csv(StringIO(s), index_col=[pyiem.TIMESTAMP, pyiem.SYMBOL])
         dedupe_idx = df.index.difference(df.index)
         iter_df = df.reindex(dedupe_idx)
         self.assertEqual(len(iter_df), 0)

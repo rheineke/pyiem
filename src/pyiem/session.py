@@ -11,9 +11,9 @@ from urllib.parse import urlencode, parse_qs
 import pandas as pd
 import requests
 
-import iem
-from iem.config import read_markets
-from iem.order import Single, Bundle, to_string
+from src import pyiem
+from src.pyiem.config import read_markets
+from src.pyiem.order import Single, Bundle, to_string
 
 
 class Session:
@@ -54,7 +54,7 @@ class Session:
         data = {'market': market.id}
         response = self._session.post(url=url, data=data)
 
-        df = _frame(response, **dict(index_col=iem.CONTRACT))
+        df = _frame(response, **dict(index_col=pyiem.CONTRACT))
         alt_df = _orderbook_tag_frame(response.text)
         return df.combine_first(alt_df)
 
@@ -68,7 +68,7 @@ class Session:
             # '_sourcePage': '',
             # '_fp': '',
         }
-        kwargs = dict(index_col=iem.DATE, parse_dates=[iem.DATE])
+        kwargs = dict(index_col=pyiem.DATE, parse_dates=[pyiem.DATE])
         return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
 
     def outstanding_orders(self, contract, side):
@@ -81,13 +81,13 @@ class Session:
         }
         response = self._session.post(url=url, data=data)
 
-        date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
-        kwargs = dict(index_col=iem.ORDER_DATE, parse_dates=date_cols)
+        date_cols = [pyiem.ORDER_DATE, pyiem.EXPIRATION]
+        kwargs = dict(index_col=pyiem.ORDER_DATE, parse_dates=date_cols)
         # return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
 
         df = _frame(response, **kwargs)
         oid_df = _order_id_tag_frame(response.text)
-        cxl_o = iem.CANCEL_ORDER
+        cxl_o = pyiem.CANCEL_ORDER
         df[cxl_o] = df[cxl_o].combine_first(oid_df[cxl_o])
         return df
 
@@ -155,8 +155,8 @@ class Session:
             'market': market.id,
         }
         url = _build_url('TraderMessages.action?' + urlencode(data))
-        date_cols = [iem.DATE, iem.EXPIRATION_DATE]
-        kwargs = dict(index_col=iem.DATE, parse_dates=date_cols)
+        date_cols = [pyiem.DATE, pyiem.EXPIRATION_DATE]
+        kwargs = dict(index_col=pyiem.DATE, parse_dates=date_cols)
         return self._get_frame(url=url, read_html_kwargs=kwargs)
 
     def _post_frame(self, url, data, read_html_kwargs=None):
@@ -183,16 +183,16 @@ def _frame(response, **kwargs):
 
 
 def _build_url(path):
-    return ''.join([iem.URL, 'trader/', path])
+    return ''.join([pyiem.URL, 'trader/', path])
 
 
 def order_type(side):
-    return 'bid' if side == iem.Side.BUY else 'ask'
+    return 'bid' if side == pyiem.Side.BUY else 'ask'
 
 
 def bundle_order_type(side, counterparty):
     is_exch = counterparty is counterparty.Exchange
-    if side == iem.Side.SELL:
+    if side == pyiem.Side.SELL:
         return 'sellAtFixed' if is_exch else 'sellAtMarketBidPrice'
     else:
         return 'buyAtFixed' if is_exch else 'buyAtMarketAskPrice'
@@ -230,11 +230,11 @@ def _orderbook_tag_frame(text):
         index.append(tr.find(path='td').text.strip())
         # Quantity Held
         pos = pd.to_numeric(tr.find(path=qty_path).attrib['value'])
-        data[iem.QUANTITY_HELD].append(pos)
+        data[pyiem.QUANTITY_HELD].append(pos)
         # Your Bids
-        data[iem.YOUR_BIDS].append(_num_open_orders(tr, 'yourBidsCell'))
+        data[pyiem.YOUR_BIDS].append(_num_open_orders(tr, 'yourBidsCell'))
         # Your Asks
-        data[iem.YOUR_ASKS].append(_num_open_orders(tr, 'yourAsksCell'))
+        data[pyiem.YOUR_ASKS].append(_num_open_orders(tr, 'yourAsksCell'))
 
     return pd.DataFrame(data=data, index=index)
 
@@ -248,8 +248,8 @@ def _order_id_tag_frame(text):
         index_data.append(pd.to_datetime(tr.find('td').text))
         a = tr.find('td/a')
         href = parse_qs(a.attrib['href'])
-        data[iem.CANCEL_ORDER].append(float(href['bidOrder'][0]))
-    index_data = pd.DatetimeIndex(data=index_data, name=iem.ORDER_DATE)
+        data[pyiem.CANCEL_ORDER].append(float(href['bidOrder'][0]))
+    index_data = pd.DatetimeIndex(data=index_data, name=pyiem.ORDER_DATE)
     return pd.DataFrame(data=data, index=index_data)
 
 

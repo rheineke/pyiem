@@ -1,4 +1,4 @@
-from iem import config
+from src.pyiem import config
 
 
 class Market:

@@ -1,6 +1,6 @@
 import pandas as pd
 
-import iem
+from src import pyiem
 
 table_text = """
 <table id="data-table" class="table table-striped form-table jumbotronTable" aria-describedby="Trader activity table">
@@ -27,7 +27,7 @@ table_text = """
         <td>0.001000</td>
         <td></td>
         <td>
-        <a data-confirm-button="Yes, cancel this order" ata-cancel-button="No, take me back" data-text="Are you sure you wish to cancel this order?" href="/iem/trader/TraderActivity.action?cancelBidOrder=&amp;market=51&amp;bidOrder=4600000&amp;asset=3054&amp;activityType=bid" title="Cancel this order" class="submitBtn confirm"><img class="cancelOrderBtn" src="/iem/images/x_icon_red.png" alt="Cancel this bid order"/>
+        <a data-confirm-button="Yes, cancel this order" ata-cancel-button="No, take me back" data-text="Are you sure you wish to cancel this order?" href="/pyiem/trader/TraderActivity.action?cancelBidOrder=&amp;market=51&amp;bidOrder=4600000&amp;asset=3054&amp;activityType=bid" title="Cancel this order" class="submitBtn confirm"><img class="cancelOrderBtn" src="/pyiem/images/x_icon_red.png" alt="Cancel this bid order"/>
         </a>
         </td>
     </tr>
@@ -37,11 +37,11 @@ table_text = """
 
 
 def main():
-    date_cols = [iem.ORDER_DATE, iem.EXPIRATION]
-    kwargs = dict(index_col=iem.ORDER_DATE, parse_dates=date_cols)
+    date_cols = [pyiem.ORDER_DATE, pyiem.EXPIRATION]
+    kwargs = dict(index_col=pyiem.ORDER_DATE, parse_dates=date_cols)
     dfs = pd.read_html(table_text, **kwargs)
     df = dfs[0]
 
     oid_df = pd.DataFrame()
-    cxl_o = iem.CANCEL_ORDER
+    cxl_o = pyiem.CANCEL_ORDER
     df[cxl_o] = df[cxl_o].combine_first(oid_df[cxl_o])

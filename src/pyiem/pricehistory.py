@@ -8,9 +8,9 @@ import pandas as pd
 import pytz
 import requests
 
-import iem
-from iem import config
-from iem.contract import Market
+from src import pyiem
+from src.pyiem import config
+from src.pyiem.contract import Market
 
 NAME = 'daily_price_history'
 
@@ -32,8 +32,8 @@ def price_history_frame(mkt_id, year, month):
     url = _build_url('pricehistory/PriceHistory_GetData.cfm')
     data = dict(Market_ID=mkt_id, Month='{:02d}'.format(month), Year=year)
     response = requests.post(url=url, data=data)
-    index_cols = [iem.DATE, iem.CONTRACT]
-    kwargs = dict(header=0, parse_dates=[iem.DATE], index_col=index_cols)
+    index_cols = [pyiem.DATE, pyiem.CONTRACT]
+    kwargs = dict(header=0, parse_dates=[pyiem.DATE], index_col=index_cols)
     try:
         dfs = pd.read_html(response.text, **kwargs)
     except ValueError:
@@ -69,22 +69,22 @@ def history_dates(mkt_id):
 
 
 def _build_url(path):
-    return ''.join([iem.LEGACY_URL, path])
+    return ''.join([pyiem.LEGACY_URL, path])
 
 
 # TODO: Move to strategy module
 def agg_frame(px_hist_df):
-    notnull_label = px_hist_df[iem.UNITS] != 0
-    c_gb = px_hist_df.loc[notnull_label].groupby(level=iem.CONTRACT)
+    notnull_label = px_hist_df[pyiem.UNITS] != 0
+    c_gb = px_hist_df.loc[notnull_label].groupby(level=pyiem.CONTRACT)
     agg_arg = {
-        iem.LOW_PX: np.min,
-        iem.HIGH_PX: np.max,
-        iem.UNITS: np.sum,
-        iem.DOLLAR_VOLUME: np.sum,
-        iem.LST_PX: lambda s: s.ix[-1],
+        pyiem.LOW_PX: np.min,
+        pyiem.HIGH_PX: np.max,
+        pyiem.UNITS: np.sum,
+        pyiem.DOLLAR_VOLUME: np.sum,
+        pyiem.LST_PX: lambda s: s.ix[-1],
     }
     df = c_gb.agg(arg=agg_arg)
-    df[iem.AVG_PX] = df[iem.DOLLAR_VOLUME].div(df[iem.UNITS]).round(3)
+    df[pyiem.AVG_PX] = df[pyiem.DOLLAR_VOLUME].div(df[pyiem.UNITS]).round(3)
     return df
 
 
@@ -120,9 +120,9 @@ def _market_quote_url(mkt_conf):
 
 def _modify_frame(df, timestamp):
     # Append timestamp
-    df[iem.TIMESTAMP] = timestamp
+    df[pyiem.TIMESTAMP] = timestamp
 
-    return df.reset_index().set_index([iem.TIMESTAMP, iem.SYMBOL])
+    return df.reset_index().set_index([pyiem.TIMESTAMP, pyiem.SYMBOL])
 
 
 def _timestamp(text):

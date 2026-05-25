@@ -2,7 +2,7 @@ import asyncio
 
 import pandas as pd
 
-from iem import recorder
+from src.pyiem import recorder
 
 
 def read_and_write_quotes(now, loop):

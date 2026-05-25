@@ -1,9 +1,9 @@
-import iem
-from iem.config import read_login
-from iem.contract import Contract, Market
-from iem.session import Session
+from src import pyiem
+from src.pyiem import read_login
+from src.pyiem import Contract, Market
+from src.pyiem.session import Session
 
-if __name__ == '__main__':
+def main():
     login_kwargs = read_login()
     sess = Session(**login_kwargs)
     login_response = sess.authenticate()
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     oa_df = sess.holdings(asset)
 
     # Get outstanding orders
-    oo_df = sess.outstanding_orders(asset, iem.BID)
+    oo_df = sess.outstanding_orders(asset, pyiem.BID)
 
     # Get trade messages
     msg_df = sess.messages(mkt)
@@ -30,3 +30,6 @@ if __name__ == '__main__':
     # latest_ob_df = sess.place_order(o)
 
     logout_response = sess.logout()
+
+if __name__ == '__main__':
+    main()

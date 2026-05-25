@@ -3,8 +3,8 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from iem import Side
-from iem.order import PriceTimeLimit, Single, to_string
+from src.pyiem import Side
+from src.pyiem.order import PriceTimeLimit, Single, to_string
 
 
 def _test_expiry():

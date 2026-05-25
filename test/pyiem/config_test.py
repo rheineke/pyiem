@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 
-from iem import config
+from src.pyiem import config
 
 
 class ConfigTest(unittest.TestCase):

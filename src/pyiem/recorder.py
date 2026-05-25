@@ -10,8 +10,9 @@ from pathlib import Path
 import pandas as pd
 import sqlalchemy as sa
 
-import iem
-from iem import config, contract, pricehistory as px_hist
+from src import pyiem
+from src.pyiem import pricehistory as px_hist
+from src.pyiem import contract, config
 
 DAILY_MARKET = 'daily_market'
 QUOTES = 'quotes'
@@ -72,7 +73,7 @@ def quotes_table(metadata, market):
 
 def store_path(path=None):
     if path is None:
-        path = 'data/iem.hdf'
+        path = 'data/pyiem.hdf'
     return Path(path)
 
 
@@ -132,8 +133,8 @@ def read_daily_market_data(market):
         oct_2001_idx = 9
         df = px_hist_dfs[oct_2001_idx]
         tail_df = df.iloc[1:].reset_index()
-        tail_df[iem.DATE] = pd.to_datetime(tail_df[iem.DATE])
-        clean_df = tail_df.set_index([iem.DATE, iem.CONTRACT])
+        tail_df[pyiem.DATE] = pd.to_datetime(tail_df[pyiem.DATE])
+        clean_df = tail_df.set_index([pyiem.DATE, pyiem.CONTRACT])
         px_hist_dfs[oct_2001_idx] = clean_df
 
         px_hist_df = pd.concat(px_hist_dfs)

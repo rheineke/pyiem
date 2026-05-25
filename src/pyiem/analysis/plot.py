@@ -2,9 +2,8 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-import iem
-from iem import config, pricehistory as px_hist, recorder
-from iem import contract
+from src import pyiem
+from src.pyiem import contract, config, recorder
 
 EXPIRY = 'expiry'
 DAYS_TO_EXPIRY_DATE = 'days_to_expiry_date'
@@ -28,7 +27,7 @@ def expiry_date_series(expiry_str, *, expiry_date_json):
 
 
 def cumulative_units_frame(bundle_history_df):
-    return cumsum_frame(bundle_history_df[iem.UNITS])
+    return cumsum_frame(bundle_history_df[pyiem.UNITS])
 
 
 def cumsum_frame(bundle_history_srs):
@@ -62,35 +61,35 @@ if __name__ == '__main__':
     # Clean dataframe
     df = px_hist_df.copy().reset_index()
     # Expiry
-    df[EXPIRY] = df[iem.CONTRACT].apply(expiry)
+    df[EXPIRY] = df[pyiem.CONTRACT].apply(expiry)
     # Expiry date
     expiry_date_json = mkt_conf[config.BUNDLE]
     kwargs = {'expiry_date_json': expiry_date_json}
     df[config.EXPIRY_DATE] = df[EXPIRY].apply(expiry_date_series, **kwargs)
     # Days to expiration
-    df[DAYS_TO_EXPIRY_DATE] = df[config.EXPIRY_DATE] - df[iem.DATE]
+    df[DAYS_TO_EXPIRY_DATE] = df[config.EXPIRY_DATE] - df[pyiem.DATE]
 
     # Bundle frame
     bundle = '1116'
     bundle_assets = list(mkt_conf[config.BUNDLE][bundle][config.ASSETS].keys())
-    bundle_lbl = df[iem.CONTRACT].str.contains(bundle)
+    bundle_lbl = df[pyiem.CONTRACT].str.contains(bundle)
     bundle_df = df.loc[bundle_lbl]
 
     bundle_df = px_hist_df.loc[bundle_slice(mkts_json, mkt_name, bundle), :]
-    # plot_cumsum(bundle_df[iem.UNITS])
-    plot_cumsum(bundle_df[iem.DOLLAR_VOLUME])
+    # plot_cumsum(bundle_df[pyiem.UNITS])
+    plot_cumsum(bundle_df[pyiem.DOLLAR_VOLUME])
 
-    # plot_cumsum(px_hist_df[iem.UNITS])
-    plot_cumsum(px_hist_df[iem.DOLLAR_VOLUME])
+    # plot_cumsum(px_hist_df[pyiem.UNITS])
+    plot_cumsum(px_hist_df[pyiem.DOLLAR_VOLUME])
 
-    # gb = df.groupby([EXPIRY, iem.DATE])
+    # gb = df.groupby([EXPIRY, pyiem.DATE])
     # agg_dict = {
-    #     iem.UNITS: np.sum,
-    #     iem.DVOL: np.sum,
-    #     iem.LOW_PX: np.sum,
-    #     iem.HIGH_PX: np.sum,
-    #     iem.AVG_PX: np.sum,
-    #     iem.LST_PX: np.sum,
+    #     pyiem.UNITS: np.sum,
+    #     pyiem.DVOL: np.sum,
+    #     pyiem.LOW_PX: np.sum,
+    #     pyiem.HIGH_PX: np.sum,
+    #     pyiem.AVG_PX: np.sum,
+    #     pyiem.LST_PX: np.sum,
     #     config.EXPIRY_DATE: 'first',
     #     DAYS_TO_EXPIRY_DATE: 'first',
     # }
@@ -103,6 +102,6 @@ if __name__ == '__main__':
     # TODO: Match price history graphs on website
     # TODO: Construct days to expiration. Useful feature?
     # TODO: Arbitrage analysis
-    # cols = [iem.LOW_PX, iem.HIGH_PX, iem.AVG_PX, iem.LST_PX]
+    # cols = [pyiem.LOW_PX, pyiem.HIGH_PX, pyiem.AVG_PX, pyiem.LST_PX]
     # kwargs = dict(c='blue', marker='o', label='Training data')
     # plt.plot(sept16_df[cols], **kwargs)
