@@ -8,7 +8,7 @@ ERR=$?
 # Run market data recorder if unit tests passed
 if [ $ERR -eq 0 ]; then
     printf "All unit tests passed\n\n"
-    python3 run_market_data_recorder.py
+    python run_market_data_recorder.py
 elif [ $ERR -eq 1 ]; then
     printf "One or more unit tests failed. Market data recorder not run\n"
 fi

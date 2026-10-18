@@ -1,0 +1,10 @@
+name: pyiem
+channels:
+  - conda-forge
+dependencies:
+  - python=3.14.8
+  - pip
+  - pre-commit
+  - pytables  # HDF5 for pandas.HDFStore; conda ships the HDF5 C library
+  - pip:
+      - -e ".[dev,plot,test]"  # installs your project via pyproject.toml

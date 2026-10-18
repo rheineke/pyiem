@@ -1,13 +1,13 @@
-from iem import config
+from pyiem import config
 
 
 class Market:
     def __init__(self, market_name, market_fp=None):
         self.name = market_name
-        self.id = config.read_markets(market_fp)[market_name]['id']
+        self.id = config.read_markets(market_fp)[market_name]["id"]
 
     def __repr__(self):
-        return '{}: {}'.format(self.name, self.id)
+        return f"{self.name}: {self.id}"
 
 
 class ContractBundle:
@@ -23,14 +23,11 @@ class Contract:
         self.contract_name = contract_name
         self.market = Market(market_name)
         a = config.find_asset(config.read_markets(), market_name, contract_name)
-        self.asset_id = int(a['id'])
-        self.asset_to_market_id = int(a['order'])
+        self.asset_id = int(a["id"])
+        self.asset_to_market_id = int(a["order"])
 
     def __repr__(self):
         fmt = "{}: market: {}, asset_id: {}, asset_to_market_id: {}"
         return fmt.format(
-            self.contract_name,
-            self.market,
-            self.asset_id,
-            self.asset_to_market_id
+            self.contract_name, self.market, self.asset_id, self.asset_to_market_id
         )

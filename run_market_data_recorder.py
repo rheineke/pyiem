@@ -2,7 +2,7 @@ import asyncio
 
 import pandas as pd
 
-from iem import recorder
+from pyiem import recorder
 
 
 def read_and_write_quotes(now, loop):
@@ -10,13 +10,14 @@ def read_and_write_quotes(now, loop):
     delay = 15 * 60  # HTML is updated once every 15 minutes
     loop.call_later(delay, read_and_write_quotes, pd.Timestamp.now(), loop)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Publicly available data
     # Daily summary data
     # recorder.retrieve_and_store_daily_data()
 
     # Quotes data
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
 
     # Schedule a call to retrieve quotes and store them
     loop.call_soon(read_and_write_quotes, pd.Timestamp.now(), loop)
@@ -49,4 +50,3 @@ if __name__ == '__main__':
 
     # Record orderbooks after all session I/O to minimize time difference
     # between market snapshotes
-

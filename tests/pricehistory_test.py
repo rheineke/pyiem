@@ -1,16 +1,16 @@
 import unittest
+from zoneinfo import ZoneInfo
 
 import pandas as pd
-import pytz
 
-from iem import pricehistory as px_hist
+from pyiem import pricehistory as px_hist
 
 
 class PriceHistoryTest(unittest.TestCase):
     def test_market_name(self):
         table_headers = px_hist._table_headers(HTML_STR)
         names = [px_hist._market_name(s) for s in table_headers]
-        exp_names = ['Congress18', 'House18', 'Senate18']
+        exp_names = ["Congress18", "House18", "Senate18"]
         self.assertEqual(names, exp_names)
 
     def test_timestamp(self):
@@ -18,7 +18,7 @@ class PriceHistoryTest(unittest.TestCase):
         tss = [px_hist._timestamp(s) for s in table_headers]
         ts_kwds = dict(year=2016, month=12, day=31, hour=7, minute=45, second=1)
         naive_ts = pd.Timestamp(**ts_kwds)
-        exp_ts = naive_ts.tz_localize(pytz.timezone('US/Central'))
+        exp_ts = naive_ts.tz_localize(ZoneInfo("America/Chicago"))
         for ts in tss:
             self.assertEqual(ts, exp_ts)
 

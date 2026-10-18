@@ -1,7 +1,8 @@
 """Information that can be retrieved from daily historical data"""
 
-import iem
-from iem import config, pricehistory as px_hist, recorder
+import pyiem
+from pyiem import config, recorder
+from pyiem import pricehistory as px_hist
 
 
 def contract_dates_frame(daily_price_history_df):
@@ -13,12 +14,10 @@ def contract_dates_frame(daily_price_history_df):
     :return:
     """
     df = daily_price_history_df.reset_index()
-    gb = df.groupby(iem.CONTRACT)
-    agg_args = {
-        config.OPEN_DATE: min,
-        config.LIQUIDATION_DATE: max,
-    }
-    dt_df = gb[iem.DATE].aggregate(agg_args)
+    gb = df.groupby(pyiem.CONTRACT)
+    dt_df = gb[pyiem.DATE].agg(
+        **{config.OPEN_DATE: "min", config.LIQUIDATION_DATE: "max"}
+    )
     return dt_df.sort_values(by=config.LIQUIDATION_DATE)
 
 
@@ -31,11 +30,11 @@ def _table_names(store):
     return names
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     mkt_date_dict = {}
-    with recorder.open_store('data/hist_iem.hdf') as hdf_store:
+    with recorder.open_store("data/hist_iem.hdf") as hdf_store:
         table_names = _table_names(hdf_store)
         for name in table_names:
             df = hdf_store[name]
-            mkt = name.split('_')[0]
+            mkt = name.split("_")[0]
             mkt_date_dict[mkt] = contract_dates_frame(df)
