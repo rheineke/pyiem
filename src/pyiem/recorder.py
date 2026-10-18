@@ -1,9 +1,6 @@
 """
 Record daily historical data and 15 minute market snapshots in an HDF store
 """
-# Python 2 and 3:
-from __future__ import print_function
-
 import os
 from pathlib import Path
 

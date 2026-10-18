@@ -1,5 +1,4 @@
 import json
-from pprint import pprint
 
 from src.pyiem.session import Session
 from src.pyiem import Bundle, PriceTimeLimit, Single, Counterparty

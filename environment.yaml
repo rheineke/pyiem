@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.13.5
+  - libpython
   - pip
   - pip:
       - -e .        # installs your project via pyproject.toml
