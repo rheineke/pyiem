@@ -1,16 +1,16 @@
 """Iowa Electronic Markets price history"""
 import datetime as dt
 import itertools
-from collections import OrderedDict
+from io import StringIO
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
-import pytz
 import requests
 
-from src import pyiem
-from src.pyiem import config
-from src.pyiem.contract import Market
+import pyiem
+from pyiem import config
+from pyiem.contract import Market
 
 NAME = 'daily_price_history'
 
@@ -35,7 +35,7 @@ def price_history_frame(mkt_id, year, month):
     index_cols = [pyiem.DATE, pyiem.CONTRACT]
     kwargs = dict(header=0, parse_dates=[pyiem.DATE], index_col=index_cols)
     try:
-        dfs = pd.read_html(response.text, **kwargs)
+        dfs = pd.read_html(StringIO(response.text), **kwargs)
     except ValueError:
         dfs = [pd.DataFrame()]
 
@@ -53,16 +53,16 @@ def price_history_frame(mkt_id, year, month):
 def history_dates(mkt_id):
     url = _build_url('pricehistory/pricehistory_selectcontract.cfm')
     response = requests.get(url=url, params={'Market_ID': mkt_id})
-    dfs = pd.read_html(response.text, index_col=0)
+    dfs = pd.read_html(StringIO(response.text), index_col=0)
 
     # Expect a singleton list
     assert len(dfs) == 1
 
     df = dfs[0]
 
-    mon_str = df.ix['Month:'][1]
+    mon_str = df.loc['Month:'].iloc[1]
     months = [dt.datetime.strptime(s[:3], '%b').month for s in mon_str.split()]
-    year_str = df.ix['Year'][1]
+    year_str = df.loc['Year'].iloc[1]
     years = [int(s) for s in year_str.split()]
 
     return itertools.product(years, months)
@@ -77,13 +77,13 @@ def agg_frame(px_hist_df):
     notnull_label = px_hist_df[pyiem.UNITS] != 0
     c_gb = px_hist_df.loc[notnull_label].groupby(level=pyiem.CONTRACT)
     agg_arg = {
-        pyiem.LOW_PX: np.min,
-        pyiem.HIGH_PX: np.max,
-        pyiem.UNITS: np.sum,
-        pyiem.DOLLAR_VOLUME: np.sum,
-        pyiem.LST_PX: lambda s: s.ix[-1],
+        pyiem.LOW_PX: 'min',
+        pyiem.HIGH_PX: 'max',
+        pyiem.UNITS: 'sum',
+        pyiem.DOLLAR_VOLUME: 'sum',
+        pyiem.LST_PX: 'last',
     }
-    df = c_gb.agg(arg=agg_arg)
+    df = c_gb.agg(agg_arg)
     df[pyiem.AVG_PX] = df[pyiem.DOLLAR_VOLUME].div(df[pyiem.UNITS]).round(3)
     return df
 
@@ -100,7 +100,8 @@ def read_quote_frame(mkt_conf):
 def read_quote_frames(mkt_conf):
     url = _market_quote_url(mkt_conf)
     response = requests.get(url=url)
-    dfs = pd.read_html(response.text, index_col=0, header=0, na_values=['---'])
+    html = StringIO(response.text)
+    dfs = pd.read_html(html, index_col=0, header=0, na_values=['---'])
 
     # Data outside of the HTML tables
     table_headers = _table_headers(response.text)
@@ -110,7 +111,7 @@ def read_quote_frames(mkt_conf):
     # Modify data frames
     mod_dfs = [_modify_frame(df, ts) for df, ts in zip(dfs, timestamps)]
 
-    return OrderedDict((nm, df) for nm, df in zip(market_names, mod_dfs))
+    return dict(zip(market_names, mod_dfs, strict=True))
 
 
 def _market_quote_url(mkt_conf):
@@ -136,13 +137,12 @@ def _timestamp(text):
     dt_str = time_str + ', ' + date_str
     # tz-naive timestamp
     naive_ts = pd.to_datetime(dt_str, format='%H:%M:%S, %A, %B %d, %Y')
-    # Replace tz_str with something recognized by pytz
-    tz_dict = {'CST': 'US/Central'}
+    # Replace tz_str with an IANA time zone name
+    tz_dict = {'CST': 'America/Chicago'}
     clean_zone = raw_zone[:-1]
     zone = tz_dict.get(clean_zone, clean_zone)
-    tz = pytz.timezone(zone)
     # Return tz-aware timestamp
-    return naive_ts.tz_localize(tz)
+    return naive_ts.tz_localize(ZoneInfo(zone))
 
 
 def _market_name(text):

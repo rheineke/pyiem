@@ -1,8 +1,8 @@
 """Information that can be retrieved from daily historical data"""
 
-from src import pyiem
-from src.pyiem import pricehistory as px_hist
-from src.pyiem import config, recorder
+import pyiem
+from pyiem import pricehistory as px_hist
+from pyiem import config, recorder
 
 
 def contract_dates_frame(daily_price_history_df):
@@ -15,11 +15,9 @@ def contract_dates_frame(daily_price_history_df):
     """
     df = daily_price_history_df.reset_index()
     gb = df.groupby(pyiem.CONTRACT)
-    agg_args = {
-        config.OPEN_DATE: min,
-        config.LIQUIDATION_DATE: max,
-    }
-    dt_df = gb[pyiem.DATE].aggregate(agg_args)
+    dt_df = gb[pyiem.DATE].agg(
+        **{config.OPEN_DATE: 'min', config.LIQUIDATION_DATE: 'max'}
+    )
     return dt_df.sort_values(by=config.LIQUIDATION_DATE)
 
 

@@ -1,7 +1,6 @@
 """Convenience functions that perform I/O to read local configuration files"""
 import json
 
-import collections
 import pandas as pd
 import sqlalchemy as sa
 
@@ -27,7 +26,7 @@ def read_markets(market_fp=None):
         market_fp = 'conf/markets.json'
 
     with open(market_fp) as fp:
-        mkts = json.load(fp, object_hook=collections.OrderedDict)
+        mkts = json.load(fp)
 
     return mkts
 

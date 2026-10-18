@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from src import pyiem
-from src.pyiem import contract, config, recorder
+import pyiem
+from pyiem import contract, config, recorder
 
 EXPIRY = 'expiry'
 DAYS_TO_EXPIRY_DATE = 'days_to_expiry_date'

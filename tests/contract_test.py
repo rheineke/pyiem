@@ -1,7 +1,7 @@
 import unittest
 
-from src.pyiem import config
-from src.pyiem.contract import Market
+from pyiem import config
+from pyiem.contract import Market
 
 
 class MarketTest(unittest.TestCase):

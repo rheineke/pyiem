@@ -1,7 +1,7 @@
-from src import pyiem
-from src.pyiem import read_login
-from src.pyiem import Contract, Market
-from src.pyiem.session import Session
+import pyiem
+from pyiem.config import read_login
+from pyiem.contract import Contract, Market
+from pyiem.session import Session
 
 def main():
     login_kwargs = read_login()

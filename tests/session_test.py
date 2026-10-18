@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src import pyiem
+import pyiem
 
 table_text = """
 <table id="data-table" class="table table-striped form-table jumbotronTable" aria-describedby="Trader activity table">

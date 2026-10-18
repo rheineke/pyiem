@@ -1,15 +1,15 @@
 import unittest
-from io import StringIO  # for handling unicode strings
+from io import StringIO
 
 import pandas as pd
 
-from src import pyiem
-from src.pyiem import recorder
+import pyiem
+from pyiem import recorder
 
 
 class HFDStoreTest(unittest.TestCase):
     def testDuplicateData(self):
-        s = u"""Timestamp,Symbol,Bid,Ask,Last,Low,High,Average
+        s = """Timestamp,Symbol,Bid,Ask,Last,Low,High,Average
         2016-11-19 06:45:00-06:00,FRup1216,0.9,0.95,0.95,,,
         2016-11-19 06:45:00-06:00,FRsame1216,0.07,0.125,0.061,,,
         2016-11-19 06:45:00-06:00,FRdown1216,0.0,0.001,0.002,,,

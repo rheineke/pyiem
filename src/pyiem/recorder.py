@@ -1,15 +1,14 @@
 """
 Record daily historical data and 15 minute market snapshots in an HDF store
 """
-import os
 from pathlib import Path
 
 import pandas as pd
 import sqlalchemy as sa
 
-from src import pyiem
-from src.pyiem import pricehistory as px_hist
-from src.pyiem import contract, config
+import pyiem
+from pyiem import pricehistory as px_hist
+from pyiem import contract, config
 
 DAILY_MARKET = 'daily_market'
 QUOTES = 'quotes'
@@ -76,14 +75,7 @@ def store_path(path=None):
 
 def open_store(path=None, mode=None):
     store_p = store_path(path)
-    parent_path = store_p.parent
-    # Since Python 3.5, we can request nested existing directories directly from
-    # path-like object without exception
-    # parent_path.mkdir(parents=False, exist_ok=True)
-    try:
-        os.makedirs(parent_path.as_posix())
-    except OSError:
-        pass
+    store_p.parent.mkdir(parents=True, exist_ok=True)
     # Add to HDFStore arguments if size becomes an issue
     # , complevel=9, complib='zlib'
     return pd.HDFStore(path=store_p.as_posix(), mode=mode)

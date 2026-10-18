@@ -2,7 +2,7 @@ import asyncio
 
 import pandas as pd
 
-from src.pyiem import recorder
+from pyiem import recorder
 
 
 def read_and_write_quotes(now, loop):
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     # recorder.retrieve_and_store_daily_data()
 
     # Quotes data
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
 
     # Schedule a call to retrieve quotes and store them
     loop.call_soon(read_and_write_quotes, pd.Timestamp.now(), loop)

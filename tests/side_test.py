@@ -1,6 +1,6 @@
 import unittest
 
-from src import pyiem
+import pyiem
 
 
 class IowaElectronicMarketsTest(unittest.TestCase):

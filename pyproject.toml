@@ -1,18 +1,36 @@
 [project]
 name = "pyiem"
 version = "0.1.0"
-requires-python = ">=3.13.5"
+description = "Iowa Electronic Markets client: sessions, orders, quotes and price history"
+readme = "README.md"
+requires-python = ">=3.14.8"
 dependencies = [
-    "pandas==2.3.3",
-    "sqlalchemy"
+    "lxml>=6.1",
+    "numpy>=2.5",
+    "pandas>=3.0",
+    "requests>=2.32",
+    "sqlalchemy>=2.1",
+    "tables>=3.11",
 ]
 
 [project.optional-dependencies]
-dev = ["ipdb"]
-
-[project.scripts]
-dtc_member = "trading_firm_data.commands.dtc_member:main"
+dev = ["ipdb", "mypy", "ruff", "types-requests"]
+plot = ["matplotlib>=3.11"]
+test = ["pytest"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["*_test.py"]

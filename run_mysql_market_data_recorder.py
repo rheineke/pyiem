@@ -1,9 +1,10 @@
 import json
+from collections import defaultdict
 
 import pandas as pd
 import sqlalchemy as sa
 
-from src.pyiem import contract, config, recorder
+from pyiem import contract, config, recorder
 
 
 def create_all(metadata, mkt_conf):
@@ -29,8 +30,8 @@ def insert_config_data(engine):
     # mkt_df.to_sql(config.MARKETS, **sql_kwargs)
 
     # Bundles and assets table data
-    bundle_data = pd.compat.OrderedDefaultdict(list)
-    asset_data = pd.compat.OrderedDefaultdict(list)
+    bundle_data = defaultdict(list)
+    asset_data = defaultdict(list)
 
     for mkt_name, mkt_dict in mkt_conf.items():
         mkt_id = mkt_dict[config.ID]
@@ -84,7 +85,8 @@ if __name__ == '__main__':
     mysql_engine = sa.engine_from_config({sa_url: mysql_url})
 
     create_fmt = 'CREATE DATABASE IF NOT EXISTS {dbname}'
-    mysql_engine.execute(create_fmt.format(dbname=dbname))
+    with mysql_engine.begin() as conn:
+        conn.execute(sa.text(create_fmt.format(dbname=dbname)))
 
     # Engine connecting to MySQL database
     engine = sa.engine_from_config(db_conf)

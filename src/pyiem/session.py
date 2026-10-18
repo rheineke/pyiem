@@ -2,16 +2,16 @@
 handled by the session object"""
 
 from collections import defaultdict
-
-from lxml import etree
-from urllib.parse import urlencode, parse_qs
+from io import StringIO
+from urllib.parse import parse_qs, urlencode
 
 import pandas as pd
 import requests
+from lxml import etree
 
-from src import pyiem
-from src.pyiem.config import read_markets
-from src.pyiem.order import Single, Bundle, to_string
+import pyiem
+from pyiem.config import read_markets
+from pyiem.order import Single, Bundle, to_string
 
 
 class Session:
@@ -90,11 +90,11 @@ class Session:
         return df
 
     def place_order(self, order):
-        if type(order) == Single and order.price_time_limit is not None:
+        if isinstance(order, Single) and order.price_time_limit is not None:
             return self.place_limit_order(order)
-        elif type(order) == Bundle:
+        elif isinstance(order, Bundle):
             return self.place_bundle_order(order)
-        elif type(order) == Single and order.price_time_limit is None:
+        elif isinstance(order, Single) and order.price_time_limit is None:
             pass
             # return self.place_market_order(order)
 
@@ -171,8 +171,7 @@ class Session:
 
 
 def _frame(response, **kwargs):
-    print(response.text)
-    dfs = pd.read_html(response.text, **kwargs)
+    dfs = pd.read_html(StringIO(response.text), **kwargs)
 
     # Expect a singleton list
     assert len(dfs) == 1
