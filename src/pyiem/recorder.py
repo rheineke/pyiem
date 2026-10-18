@@ -1,28 +1,29 @@
 """
 Record daily historical data and 15 minute market snapshots in an HDF store
 """
+
 from pathlib import Path
 
 import pandas as pd
 import sqlalchemy as sa
 
 import pyiem
+from pyiem import config, contract
 from pyiem import pricehistory as px_hist
-from pyiem import contract, config
 
-DAILY_MARKET = 'daily_market'
-QUOTES = 'quotes'
+DAILY_MARKET = "daily_market"
+QUOTES = "quotes"
 
 
 def daily_market_table(metadata, market):
     table_name = history_key(market)
     # Index columns
-    date_col = sa.Column('Date', sa.DATETIME, nullable=False)
+    date_col = sa.Column("Date", sa.DATETIME, nullable=False)
     asset_col = sa.Column(
         config.ASSET_ID,
         sa.INTEGER,
-        sa.ForeignKey(config.ASSETS + '.' + config.ID),
-        nullable=False
+        sa.ForeignKey(config.ASSETS + "." + config.ID),
+        nullable=False,
     )
 
     return sa.Table(
@@ -30,13 +31,13 @@ def daily_market_table(metadata, market):
         metadata,
         date_col,
         asset_col,
-        sa.Column('Units', sa.INTEGER, nullable=False),
-        sa.Column('$Volume', sa.INTEGER, nullable=False),
-        sa.Column('LowPrice', sa.INTEGER, nullable=False),
-        sa.Column('HighPrice', sa.INTEGER, nullable=False),
-        sa.Column('AvgPrice', sa.DECIMAL, nullable=False),
-        sa.Column('LastPrice', sa.INTEGER, nullable=True),  # Null == NaN?
-        sa.Index('idx', asset_col, date_col, unique=True),
+        sa.Column("Units", sa.INTEGER, nullable=False),
+        sa.Column("$Volume", sa.INTEGER, nullable=False),
+        sa.Column("LowPrice", sa.INTEGER, nullable=False),
+        sa.Column("HighPrice", sa.INTEGER, nullable=False),
+        sa.Column("AvgPrice", sa.DECIMAL, nullable=False),
+        sa.Column("LastPrice", sa.INTEGER, nullable=True),  # Null == NaN?
+        sa.Index("idx", asset_col, date_col, unique=True),
     )
 
 
@@ -44,12 +45,12 @@ def quotes_table(metadata, market):
     table_name = quote_key(market)
 
     # Index columns
-    ts_col = sa.Column('Timestamp', sa.TIMESTAMP, nullable=False)
+    ts_col = sa.Column("Timestamp", sa.TIMESTAMP, nullable=False)
     asset_col = sa.Column(
         config.ASSET_ID,
         sa.INTEGER,
-        sa.ForeignKey(config.ASSETS + '.' + config.ID),
-        nullable=False
+        sa.ForeignKey(config.ASSETS + "." + config.ID),
+        nullable=False,
     )
 
     return sa.Table(
@@ -57,19 +58,19 @@ def quotes_table(metadata, market):
         metadata,
         ts_col,
         asset_col,
-        sa.Column('Bid', sa.INTEGER, nullable=False),  # No example of nullable
-        sa.Column('Ask', sa.INTEGER, nullable=False),
-        sa.Column('Last', sa.INTEGER, nullable=False),
-        sa.Column('Low', sa.INTEGER, nullable=True),
-        sa.Column('High', sa.INTEGER, nullable=True),
-        sa.Column('Average', sa.DECIMAL, nullable=True),
-        sa.Index('idx', asset_col, ts_col, unique=True),
+        sa.Column("Bid", sa.INTEGER, nullable=False),  # No example of nullable
+        sa.Column("Ask", sa.INTEGER, nullable=False),
+        sa.Column("Last", sa.INTEGER, nullable=False),
+        sa.Column("Low", sa.INTEGER, nullable=True),
+        sa.Column("High", sa.INTEGER, nullable=True),
+        sa.Column("Average", sa.DECIMAL, nullable=True),
+        sa.Index("idx", asset_col, ts_col, unique=True),
     )
 
 
 def store_path(path=None):
     if path is None:
-        path = 'data/pyiem.hdf'
+        path = "data/pyiem.hdf"
     return Path(path)
 
 
@@ -82,11 +83,11 @@ def open_store(path=None, mode=None):
 
 
 def history_key(market):
-    return market.name + '_' + px_hist.NAME
+    return market.name + "_" + px_hist.NAME
 
 
 def quote_key(market):
-    return market.name + '_quotes'
+    return market.name + "_quotes"
 
 
 def retrieve_and_store_daily_data():
@@ -101,20 +102,20 @@ def retrieve_and_store_daily_data():
         mkt = contract.Market(mkt_name)
         px_hist_df = read_daily_market_data(mkt_name)
 
-        with open_store(mode='a') as hdf_store:
+        with open_store(mode="a") as hdf_store:
             key = history_key(market=mkt)
-            hdf_store.put(key=key, value=px_hist_df, format='t')
+            hdf_store.put(key=key, value=px_hist_df, format="t")
 
 
 def read_daily_market_data(market):
     """
     Read the daily snapshots from the IEM website.
 
-    :param market: 
-    :return: 
+    :param market:
+    :return:
     """
     print(market.name)
-    if market.name == 'FedPolicyB':
+    if market.name == "FedPolicyB":
         px_hist_dfs = px_hist.full_price_history_frames(market.id)
 
         # FedPolicyB data cleaning
@@ -141,7 +142,7 @@ def read_and_write_quotes(snapshot_date):
     active_mkt_conf = config.active_markets(mkt_conf, snapshot_date)
     retrieved_markets = {}
     for mkt_name, mkt_conf in active_mkt_conf.items():
-        print('{}: retrieving {}. . . '.format(snapshot_date, mkt_name), end='')
+        print(f"{snapshot_date}: retrieving {mkt_name}. . . ", end="")
         mkt = contract.Market(mkt_name)
 
         # Market snapshot may have been retrieved already
@@ -151,7 +152,7 @@ def read_and_write_quotes(snapshot_date):
 
         quotes_df = retrieved_markets[mkt_name]
 
-        with open_store(mode='a') as hdf_store:
+        with open_store(mode="a") as hdf_store:
             key = quote_key(market=mkt)
             if key in hdf_store:
                 prev_df = hdf_store[key]
@@ -159,5 +160,5 @@ def read_and_write_quotes(snapshot_date):
                 iter_df = quotes_df.reindex(dedupe_idx)
             else:
                 iter_df = quotes_df
-            hdf_store.put(key=key, value=iter_df, format='t', append=True)
-        print('{}: completed {}'.format(pd.Timestamp.now(), mkt_name))
+            hdf_store.put(key=key, value=iter_df, format="t", append=True)
+        print(f"{pd.Timestamp.now()}: completed {mkt_name}")

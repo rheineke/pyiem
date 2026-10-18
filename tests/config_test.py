@@ -17,7 +17,7 @@ class ConfigTest(unittest.TestCase):
     def _active_markets(self, ts, exp_num_active_markets, exp_num_fed_bundles):
         mkt_conf = config.read_markets()
         active_mkt_conf = config.active_markets(mkt_conf, ts)
-        fed = 'FedPolicyB'
+        fed = "FedPolicyB"
         self.assertEqual(len(active_mkt_conf), exp_num_active_markets)
         self.assertTrue(fed in active_mkt_conf)
         num_active_bundles = len(active_mkt_conf[fed][config.BUNDLE])
@@ -28,7 +28,7 @@ class ConfigTest(unittest.TestCase):
         for mkt_name, mkt_dict in mkt_conf.items():
             bundles = mkt_dict[config.BUNDLE]
             if config.BUNDLE_ID in bundles:  # bundles is expected bundle
-                bundle = config.find_bundle(mkt_conf, mkt_name, '')
+                bundle = config.find_bundle(mkt_conf, mkt_name, "")
                 self.assertEqual(bundles, bundle)
             else:
                 for bundle_exp, exp_bundle in bundles.items():

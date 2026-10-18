@@ -10,14 +10,14 @@ def _is_ioc(price, expiration):
     elif not np.isnan(price):
         return False
     else:
-        fmt = 'Price {} and expiration {} are not valid combination'
+        fmt = "Price {} and expiration {} are not valid combination"
         raise ValueError(fmt.format(price, expiration))
 
 
 def to_string(expiration):
     if pd.isnull(expiration):
-        return 'No expiration'
-    return '{:%Y-%m-%d %I:%M %p}'.format(expiration)
+        return "No expiration"
+    return f"{expiration:%Y-%m-%d %I:%M %p}"
 
 
 class PriceTimeLimit:
@@ -27,7 +27,7 @@ class PriceTimeLimit:
         self.ioc = _is_ioc(price, expiration)
 
     def __repr__(self):
-        fmt = '{price:.3f} {expiry}'
+        fmt = "{price:.3f} {expiry}"
         return fmt.format(price=self.price, expiry=to_string(self.expiration))
 
 
@@ -47,18 +47,19 @@ class Order:
 
 class Single(Order):
     def __init__(self, contract, side, quantity, price_time_limit):
-        super().__init__(side, quantity, price_time_limit,
-                         Counterparty.Participant)
+        super().__init__(side, quantity, price_time_limit, Counterparty.Participant)
         self.contract = contract
         self.id = None
 
     def __repr__(self):
-        fmt = 'Single {contract}: {side} {qty}@{pricetimelimit} ({cp})'
-        kwargs = dict(contract=self.contract,
-                      side=self.side,
-                      qty=self.quantity,
-                      pricetimelimit=self.price_time_limit,
-                      cp=self.counterparty)
+        fmt = "Single {contract}: {side} {qty}@{pricetimelimit} ({cp})"
+        kwargs = dict(
+            contract=self.contract,
+            side=self.side,
+            qty=self.quantity,
+            pricetimelimit=self.price_time_limit,
+            cp=self.counterparty,
+        )
         return fmt.format(**kwargs)
 
 
@@ -69,7 +70,11 @@ class Bundle(Order):
         self.contract_bundle = contract_bundle
 
     def __repr__(self):
-        fmt = 'Bundle {contract}: {side} {qty} ({cp})'
-        kwargs = dict(contract=self.contract_bundle, side=self.side,
-                      qty=self.quantity, cp=self.counterparty)
+        fmt = "Bundle {contract}: {side} {qty} ({cp})"
+        kwargs = dict(
+            contract=self.contract_bundle,
+            side=self.side,
+            qty=self.quantity,
+            cp=self.counterparty,
+        )
         return fmt.format(**kwargs)

@@ -4,7 +4,7 @@ from collections import defaultdict
 import pandas as pd
 import sqlalchemy as sa
 
-from pyiem import contract, config, recorder
+from pyiem import config, contract, recorder
 
 
 def create_all(metadata, mkt_conf):
@@ -26,7 +26,7 @@ def insert_config_data(engine):
     mkt_idx = pd.Index(data=idx_data, name=config.ID)
     mkt_df = pd.DataFrame(data=mkt_names, columns=[config.NAME], index=mkt_idx)
     mkt_df = mkt_df.sort_index()
-    sql_kwargs = dict(con=engine, if_exists='append')
+    sql_kwargs = dict(con=engine, if_exists="append")
     # mkt_df.to_sql(config.MARKETS, **sql_kwargs)
 
     # Bundles and assets table data
@@ -73,18 +73,19 @@ def append_assets(asset_data, bundle_id, asset_dict):
         asset_data[config.ID].append(asset_id_dict[config.ID])
         asset_data[config.BUNDLE_ID].append(bundle_id)
         asset_data[config.NAME].append(asset_name)
-        asset_data[config.ORDER_ID].append(asset_id_dict['order'])
+        asset_data[config.ORDER_ID].append(asset_id_dict["order"])
 
-if __name__ == '__main__':
-    with open('conf/db.json', 'r') as fp:
+
+if __name__ == "__main__":
+    with open("conf/db.json") as fp:
         db_conf = json.load(fp)
 
     # Engine connect to MySQL
-    sa_url = 'sqlalchemy.url'
-    mysql_url, dbname = db_conf[sa_url].rsplit(sep='/', maxsplit=1)
+    sa_url = "sqlalchemy.url"
+    mysql_url, dbname = db_conf[sa_url].rsplit(sep="/", maxsplit=1)
     mysql_engine = sa.engine_from_config({sa_url: mysql_url})
 
-    create_fmt = 'CREATE DATABASE IF NOT EXISTS {dbname}'
+    create_fmt = "CREATE DATABASE IF NOT EXISTS {dbname}"
     with mysql_engine.begin() as conn:
         conn.execute(sa.text(create_fmt.format(dbname=dbname)))
 
@@ -105,7 +106,7 @@ if __name__ == '__main__':
 
     # TODO: Populate data
     markets = [contract.Market(mkt_nm) for mkt_nm in mkt_conf.keys()]
-    with recorder.open_store('data/hist_iem.hdf') as hdf_store:
+    with recorder.open_store("data/hist_iem.hdf") as hdf_store:
         for market in markets:
             mkt_hist_key = recorder.history_key(market)
             mkt_hist_df = hdf_store[mkt_hist_key]

@@ -14,7 +14,7 @@ def _test_expiry():
 class PriceTimeLimitTest(unittest.TestCase):
     def testConstructor(self):
         ptl = PriceTimeLimit(np.nan, pd.NaT)  # IOC PriceTimeLimit
-        px = .999
+        px = 0.999
         ptl = PriceTimeLimit(px, pd.NaT)  # GTC PriceTimeLimit
         ptl = PriceTimeLimit(px, _test_expiry())  # Limit PriceTimeLimit
         with self.assertRaises(ValueError):
@@ -23,22 +23,22 @@ class PriceTimeLimitTest(unittest.TestCase):
     def testIOC(self):
         ptl = PriceTimeLimit(np.nan, pd.NaT)
         self.assertTrue(ptl.ioc)
-        px = .999
+        px = 0.999
         ptl = PriceTimeLimit(px, pd.NaT)
         self.assertFalse(ptl.ioc)
         ptl = PriceTimeLimit(px, _test_expiry())
         self.assertFalse(ptl.ioc)
 
     def testSessionStringFormat(self):
-        self.assertEqual(to_string(_test_expiry()), '2016-01-10 08:01 PM')
-        self.assertEqual(to_string(pd.NaT), 'No expiration')
+        self.assertEqual(to_string(_test_expiry()), "2016-01-10 08:01 PM")
+        self.assertEqual(to_string(pd.NaT), "No expiration")
 
     def testExpiryDate(self):
         pass
 
     def testRepr(self):
-        ptl = PriceTimeLimit(.999, _test_expiry())
-        self.assertEqual(str(ptl), '0.999 2016-01-10 08:01 PM')
+        ptl = PriceTimeLimit(0.999, _test_expiry())
+        self.assertEqual(str(ptl), "0.999 2016-01-10 08:01 PM")
 
 
 class OrderTest(unittest.TestCase):

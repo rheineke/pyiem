@@ -1,10 +1,10 @@
 """Iowa Electronic Markets price history"""
+
 import datetime as dt
 import itertools
 from io import StringIO
 from zoneinfo import ZoneInfo
 
-import numpy as np
 import pandas as pd
 import requests
 
@@ -12,7 +12,7 @@ import pyiem
 from pyiem import config
 from pyiem.contract import Market
 
-NAME = 'daily_price_history'
+NAME = "daily_price_history"
 
 
 def full_price_history_frame(mkt_id):
@@ -29,8 +29,8 @@ def full_price_history_frames(mkt_id):
 
 def price_history_frame(mkt_id, year, month):
     """Returns price history as a DataFrame"""
-    url = _build_url('pricehistory/PriceHistory_GetData.cfm')
-    data = dict(Market_ID=mkt_id, Month='{:02d}'.format(month), Year=year)
+    url = _build_url("pricehistory/PriceHistory_GetData.cfm")
+    data = dict(Market_ID=mkt_id, Month=f"{month:02d}", Year=year)
     response = requests.post(url=url, data=data)
     index_cols = [pyiem.DATE, pyiem.CONTRACT]
     kwargs = dict(header=0, parse_dates=[pyiem.DATE], index_col=index_cols)
@@ -51,8 +51,8 @@ def price_history_frame(mkt_id, year, month):
 
 
 def history_dates(mkt_id):
-    url = _build_url('pricehistory/pricehistory_selectcontract.cfm')
-    response = requests.get(url=url, params={'Market_ID': mkt_id})
+    url = _build_url("pricehistory/pricehistory_selectcontract.cfm")
+    response = requests.get(url=url, params={"Market_ID": mkt_id})
     dfs = pd.read_html(StringIO(response.text), index_col=0)
 
     # Expect a singleton list
@@ -60,16 +60,16 @@ def history_dates(mkt_id):
 
     df = dfs[0]
 
-    mon_str = df.loc['Month:'].iloc[1]
-    months = [dt.datetime.strptime(s[:3], '%b').month for s in mon_str.split()]
-    year_str = df.loc['Year'].iloc[1]
+    mon_str = df.loc["Month:"].iloc[1]
+    months = [dt.datetime.strptime(s[:3], "%b").month for s in mon_str.split()]
+    year_str = df.loc["Year"].iloc[1]
     years = [int(s) for s in year_str.split()]
 
     return itertools.product(years, months)
 
 
 def _build_url(path):
-    return ''.join([pyiem.LEGACY_URL, path])
+    return "".join([pyiem.LEGACY_URL, path])
 
 
 # TODO: Move to strategy module
@@ -77,11 +77,11 @@ def agg_frame(px_hist_df):
     notnull_label = px_hist_df[pyiem.UNITS] != 0
     c_gb = px_hist_df.loc[notnull_label].groupby(level=pyiem.CONTRACT)
     agg_arg = {
-        pyiem.LOW_PX: 'min',
-        pyiem.HIGH_PX: 'max',
-        pyiem.UNITS: 'sum',
-        pyiem.DOLLAR_VOLUME: 'sum',
-        pyiem.LST_PX: 'last',
+        pyiem.LOW_PX: "min",
+        pyiem.HIGH_PX: "max",
+        pyiem.UNITS: "sum",
+        pyiem.DOLLAR_VOLUME: "sum",
+        pyiem.LST_PX: "last",
     }
     df = c_gb.agg(agg_arg)
     df[pyiem.AVG_PX] = df[pyiem.DOLLAR_VOLUME].div(df[pyiem.UNITS]).round(3)
@@ -101,7 +101,7 @@ def read_quote_frames(mkt_conf):
     url = _market_quote_url(mkt_conf)
     response = requests.get(url=url)
     html = StringIO(response.text)
-    dfs = pd.read_html(html, index_col=0, header=0, na_values=['---'])
+    dfs = pd.read_html(html, index_col=0, header=0, na_values=["---"])
 
     # Data outside of the HTML tables
     table_headers = _table_headers(response.text)
@@ -109,14 +109,14 @@ def read_quote_frames(mkt_conf):
     timestamps = [_timestamp(s) for s in table_headers]
 
     # Modify data frames
-    mod_dfs = [_modify_frame(df, ts) for df, ts in zip(dfs, timestamps)]
+    mod_dfs = [_modify_frame(df, ts) for df, ts in zip(dfs, timestamps, strict=True)]
 
     return dict(zip(market_names, mod_dfs, strict=True))
 
 
 def _market_quote_url(mkt_conf):
-    rel_path = mkt_conf.get(config.QUOTES_URL, mkt_conf['id'])
-    return _build_url('quotes/{}.html'.format(rel_path))
+    rel_path = mkt_conf.get(config.QUOTES_URL, mkt_conf["id"])
+    return _build_url(f"quotes/{rel_path}.html")
 
 
 def _modify_frame(df, timestamp):
@@ -128,17 +128,17 @@ def _modify_frame(df, timestamp):
 
 def _timestamp(text):
     # Assume first bold entry is the datetime string
-    start_sub = 'Quotes current as of <B>'
+    start_sub = "Quotes current as of <B>"
     start_idx = text.find(start_sub) + len(start_sub)
-    end_idx = text.find('</B>', start_idx)
+    end_idx = text.find("</B>", start_idx)
     ts_str = text[start_idx:end_idx]
     # Split into time, timezone, and date strings
-    time_str, raw_zone, date_str = ts_str.split(' ', 2)
-    dt_str = time_str + ', ' + date_str
+    time_str, raw_zone, date_str = ts_str.split(" ", 2)
+    dt_str = time_str + ", " + date_str
     # tz-naive timestamp
-    naive_ts = pd.to_datetime(dt_str, format='%H:%M:%S, %A, %B %d, %Y')
+    naive_ts = pd.to_datetime(dt_str, format="%H:%M:%S, %A, %B %d, %Y")
     # Replace tz_str with an IANA time zone name
-    tz_dict = {'CST': 'America/Chicago'}
+    tz_dict = {"CST": "America/Chicago"}
     clean_zone = raw_zone[:-1]
     zone = tz_dict.get(clean_zone, clean_zone)
     # Return tz-aware timestamp
@@ -147,19 +147,19 @@ def _timestamp(text):
 
 def _market_name(text):
     # Assume word following 'Market Quotes:  ' is the market name
-    start_sub = 'Market Quotes:  '
+    start_sub = "Market Quotes:  "
     start_idx = text.find(start_sub) + len(start_sub)
-    end_idx = text.find('\r\n<BR>', start_idx)
-    return text[start_idx:end_idx].split('.html')[0]
+    end_idx = text.find("\r\n<BR>", start_idx)
+    return text[start_idx:end_idx].split(".html")[0]
 
 
 def _table_headers(text):
-    return text.split('<TABLE')[:-1]
+    return text.split("<TABLE")[:-1]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     snapshot_dt = pd.Timestamp(year=2016, month=12, day=30)
-    mkt_id = Market('FedPolicyB').id
+    mkt_id = Market("FedPolicyB").id
     # year = 2016
     # month = 6
     # px_hist_df = price_history_frame(mkt_id, year, month)
@@ -167,6 +167,5 @@ if __name__ == '__main__':
     # agg_df = agg_frame(px_hist_df)
     mkt_conf = config.read_markets()
     active_mkt_conf = config.active_markets(mkt_conf, snapshot_dt)
-    quote_dfs = read_quote_frames(active_mkt_conf['Congress18'])
+    quote_dfs = read_quote_frames(active_mkt_conf["Congress18"])
     print(quote_dfs)
-

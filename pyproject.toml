@@ -28,6 +28,12 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
+[tool.ruff.lint.per-file-ignores]
+# Exploratory scripts and constructor tests keep results in named locals;
+# test fixtures hold captured HTML verbatim
+"run_*.py" = ["F841", "B007"]
+"tests/*" = ["F841", "E501"]
+
 [tool.mypy]
 ignore_missing_imports = true
 

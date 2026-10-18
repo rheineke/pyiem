@@ -10,7 +10,8 @@ def read_and_write_quotes(now, loop):
     delay = 15 * 60  # HTML is updated once every 15 minutes
     loop.call_later(delay, read_and_write_quotes, pd.Timestamp.now(), loop)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Publicly available data
     # Daily summary data
     # recorder.retrieve_and_store_daily_data()
@@ -49,4 +50,3 @@ if __name__ == '__main__':
 
     # Record orderbooks after all session I/O to minimize time difference
     # between market snapshotes
-

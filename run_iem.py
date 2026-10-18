@@ -3,17 +3,18 @@ from pyiem.config import read_login
 from pyiem.contract import Contract, Market
 from pyiem.session import Session
 
+
 def main():
     login_kwargs = read_login()
     sess = Session(**login_kwargs)
     login_response = sess.authenticate()
 
     # Get Orderbook dataframe
-    mkt = Market('FedPolicyB')
+    mkt = Market("FedPolicyB")
     ob_df = sess.orderbook(mkt)
 
     # Get order activity
-    asset = Contract(mkt.name, 'FRup1216')
+    asset = Contract(mkt.name, "FRup1216")
     print(asset)
     oa_df = sess.holdings(asset)
 
@@ -31,5 +32,6 @@ def main():
 
     logout_response = sess.logout()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

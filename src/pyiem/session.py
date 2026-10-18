@@ -11,7 +11,7 @@ from lxml import etree
 
 import pyiem
 from pyiem.config import read_markets
-from pyiem.order import Single, Bundle, to_string
+from pyiem.order import Bundle, Single, to_string
 
 
 class Session:
@@ -29,14 +29,14 @@ class Session:
     def authenticate(self):
         # Send login request to IEM
         data = {
-            'forceLogin': False,  # Required
-            'username': self._username,
-            'password': self._password,
-            'loginSubmit': 'Sign in',  # Required
-            '_sourcePage': '',  # Required
+            "forceLogin": False,  # Required
+            "username": self._username,
+            "password": self._password,
+            "loginSubmit": "Sign in",  # Required
+            "_sourcePage": "",  # Required
         }
 
-        url = _build_url('TraderLogin.action')
+        url = _build_url("TraderLogin.action")
         return self._session.post(url=url, data=data)
 
     def _log(self, message):
@@ -44,12 +44,12 @@ class Session:
             self._logger.write(message)
 
     def logout(self):
-        data = urlencode(dict(logout=''))
-        return self._session.get(url=_build_url('TraderLogin.action?' + data))
+        data = urlencode(dict(logout=""))
+        return self._session.get(url=_build_url("TraderLogin.action?" + data))
 
     def orderbook(self, market):
-        url = _build_url('MarketTrader.action')
-        data = {'market': market.id}
+        url = _build_url("MarketTrader.action")
+        data = {"market": market.id}
         response = self._session.post(url=url, data=data)
 
         df = _frame(response, **dict(index_col=pyiem.CONTRACT))
@@ -57,11 +57,11 @@ class Session:
         return df.combine_first(alt_df)
 
     def holdings(self, contract):
-        url = _build_url('TraderActivity.action')
+        url = _build_url("TraderActivity.action")
         data = {
-            'market': contract.market.id,  # 51
-            'asset': contract.asset_id,  # 3054
-            'activityType': 'holdings',
+            "market": contract.market.id,  # 51
+            "asset": contract.asset_id,  # 3054
+            "activityType": "holdings",
             # 'viewAssetHoldings': 25,  # Net position. Required?
             # '_sourcePage': '',
             # '_fp': '',
@@ -70,11 +70,11 @@ class Session:
         return self._post_frame(url=url, data=data, read_html_kwargs=kwargs)
 
     def outstanding_orders(self, contract, side):
-        url = _build_url('TraderActivity.action')
+        url = _build_url("TraderActivity.action")
         data = {
-            'market': contract.market.id,  # 51
-            'asset': contract.asset_id,  # 3056
-            'activityType': side,
+            "market": contract.market.id,  # 51
+            "asset": contract.asset_id,  # 3056
+            "activityType": side,
             # 'viewAssetHoldings': 1,  # Number of open orders. Required?
         }
         response = self._session.post(url=url, data=data)
@@ -99,37 +99,37 @@ class Session:
             # return self.place_market_order(order)
 
     def place_limit_order(self, order):
-        url = _build_url('order/LimitOrder.action')
+        url = _build_url("order/LimitOrder.action")
         data = {
-            'limitOrderAssetToMarket': order.contract.asset_to_market_id,  # 285
-            'orderType': order_type(order.side),  # 'bid'
-            'expirationDate': to_string(order.price_time_limit.expiration),
-            'price': '{:.3f}'.format(order.price_time_limit.price),  # '0.251'
-            'limitOrderQuantity': order.quantity,  # '1',
-            'placeLimitOrder': 'Place Limit Order',
-            'market': self._order_market_dict[order.contract],  # '364'
+            "limitOrderAssetToMarket": order.contract.asset_to_market_id,  # 285
+            "orderType": order_type(order.side),  # 'bid'
+            "expirationDate": to_string(order.price_time_limit.expiration),
+            "price": f"{order.price_time_limit.price:.3f}",  # '0.251'
+            "limitOrderQuantity": order.quantity,  # '1',
+            "placeLimitOrder": "Place Limit Order",
+            "market": self._order_market_dict[order.contract],  # '364'
         }
         return self._post_frame(url=url, data=data)
 
     def place_bundle_order(self, order):
-        url = _build_url('order/BundleOrder.action')
+        url = _build_url("order/BundleOrder.action")
         data = {
-            'bundle': order.contract_bundle.id,
-            'orderType': bundle_order_type(order.side, order.counterparty),
-            'bundleOrderQuantity': order.quantity,
-            'placeBundleOrder': 'Place Bundle Order',
-            'market': order.contract_bundle.market.id,
+            "bundle": order.contract_bundle.id,
+            "orderType": bundle_order_type(order.side, order.counterparty),
+            "bundleOrderQuantity": order.quantity,
+            "placeBundleOrder": "Place Bundle Order",
+            "market": order.contract_bundle.market.id,
         }
         return self._post_frame(url=url, data=data)
 
     def place_market_order(self, order):
-        url = _build_url('order/MarketOrder.action')
+        url = _build_url("order/MarketOrder.action")
         data = {
-            'marketOrderAssetToMarket': order.contract.asset_to_market_id,
-            'orderType': str(order.side),
-            'marketOrderQuantity': order.quantity,
-            'placeMarketOrder': 'Place Market Order',
-            'market': order.contract.market.id,
+            "marketOrderAssetToMarket": order.contract.asset_to_market_id,
+            "orderType": str(order.side),
+            "marketOrderQuantity": order.quantity,
+            "placeMarketOrder": "Place Market Order",
+            "market": order.contract.market.id,
         }
         response = self._session.post(url=url, data=data)
         return response
@@ -137,22 +137,22 @@ class Session:
     def cancel_order(self, order):
         side_str = order_type(order.side)
         data = {
-            'cancel{}Order'.format(side_str.capitalize()): '',
-            'market': order.contract.market.id,
-            (side_str + 'Order'): order.id,
-            'asset': order.contract.asset_id,
-            'activityType': side_str,
+            f"cancel{side_str.capitalize()}Order": "",
+            "market": order.contract.market.id,
+            (side_str + "Order"): order.id,
+            "asset": order.contract.asset_id,
+            "activityType": side_str,
         }
-        url = _build_url('TraderActivity.action?' + urlencode(data))
+        url = _build_url("TraderActivity.action?" + urlencode(data))
         response = self._session.get(url)  # Almost certainly wrong
         return response
 
     def messages(self, market):
         data = {
-            'home': '',
-            'market': market.id,
+            "home": "",
+            "market": market.id,
         }
-        url = _build_url('TraderMessages.action?' + urlencode(data))
+        url = _build_url("TraderMessages.action?" + urlencode(data))
         date_cols = [pyiem.DATE, pyiem.EXPIRATION_DATE]
         kwargs = dict(index_col=pyiem.DATE, parse_dates=date_cols)
         return self._get_frame(url=url, read_html_kwargs=kwargs)
@@ -180,34 +180,34 @@ def _frame(response, **kwargs):
 
 
 def _build_url(path):
-    return ''.join([pyiem.URL, 'trader/', path])
+    return "".join([pyiem.URL, "trader/", path])
 
 
 def order_type(side):
-    return 'bid' if side == pyiem.Side.BUY else 'ask'
+    return "bid" if side == pyiem.Side.BUY else "ask"
 
 
 def bundle_order_type(side, counterparty):
     is_exch = counterparty is counterparty.Exchange
     if side == pyiem.Side.SELL:
-        return 'sellAtFixed' if is_exch else 'sellAtMarketBidPrice'
+        return "sellAtFixed" if is_exch else "sellAtMarketBidPrice"
     else:
-        return 'buyAtFixed' if is_exch else 'buyAtMarketAskPrice'
+        return "buyAtFixed" if is_exch else "buyAtMarketAskPrice"
 
 
 def _num_open_orders(tr_elem, klass):
-    td = tr_elem.find(path="td[@class='{}']".format(klass))
-    form = td.find('form')
+    td = tr_elem.find(path=f"td[@class='{klass}']")
+    form = td.find("form")
     if form is None:
         return pd.to_numeric(td.text)
     else:
-        val = form.find(path="input[@name='viewAssetHoldings']").attrib['value']
+        val = form.find(path="input[@name='viewAssetHoldings']").attrib["value"]
         return pd.to_numeric(val)
 
 
 def _table_text(text):
-    start_idx = text.index('<table')
-    tbl = '</table>'
+    start_idx = text.index("<table")
+    tbl = "</table>"
     end_idx = text.index(tbl) + len(tbl)
     return text[start_idx:end_idx]
 
@@ -217,35 +217,35 @@ def _orderbook_tag_frame(text):
     # https://github.com/pandas-dev/pandas/issues/14608
     table_str = _table_text(text)
     root = etree.fromstring(table_str)
-    table_body = root.find('tbody')
+    table_body = root.find("tbody")
     index = []
     data = defaultdict(list)
     # Iterator of tr objects
     qty_path = "td[@class='change-cell quantity']"
-    tr_iter = table_body.iter(tag='tr')
+    tr_iter = table_body.iter(tag="tr")
     for tr in tr_iter:
-        index.append(tr.find(path='td').text.strip())
+        index.append(tr.find(path="td").text.strip())
         # Quantity Held
-        pos = pd.to_numeric(tr.find(path=qty_path).attrib['value'])
+        pos = pd.to_numeric(tr.find(path=qty_path).attrib["value"])
         data[pyiem.QUANTITY_HELD].append(pos)
         # Your Bids
-        data[pyiem.YOUR_BIDS].append(_num_open_orders(tr, 'yourBidsCell'))
+        data[pyiem.YOUR_BIDS].append(_num_open_orders(tr, "yourBidsCell"))
         # Your Asks
-        data[pyiem.YOUR_ASKS].append(_num_open_orders(tr, 'yourAsksCell'))
+        data[pyiem.YOUR_ASKS].append(_num_open_orders(tr, "yourAsksCell"))
 
     return pd.DataFrame(data=data, index=index)
 
 
 def _order_id_tag_frame(text):
     root = etree.fromstring(_table_text(text))
-    tbody = root.find('tbody')
+    tbody = root.find("tbody")
     index_data = []
     data = defaultdict(list)
-    for tr in tbody.iter(tag='tr'):
-        index_data.append(pd.to_datetime(tr.find('td').text))
-        a = tr.find('td/a')
-        href = parse_qs(a.attrib['href'])
-        data[pyiem.CANCEL_ORDER].append(float(href['bidOrder'][0]))
+    for tr in tbody.iter(tag="tr"):
+        index_data.append(pd.to_datetime(tr.find("td").text))
+        a = tr.find("td/a")
+        href = parse_qs(a.attrib["href"])
+        data[pyiem.CANCEL_ORDER].append(float(href["bidOrder"][0]))
     index_data = pd.DatetimeIndex(data=index_data, name=pyiem.ORDER_DATE)
     return pd.DataFrame(data=data, index=index_data)
 
@@ -253,26 +253,26 @@ def _order_id_tag_frame(text):
 def _asset_market_dict(markets):
     asset_mkt_dict = dict()
     for mkt in markets.values():
-        bundles = mkt['bundle']
-        if 'assets' in bundles:
-            assets = bundles['assets'].values()
-            asset_mkt_dict.update([(a['id'], mkt['id']) for a in assets])
+        bundles = mkt["bundle"]
+        if "assets" in bundles:
+            assets = bundles["assets"].values()
+            asset_mkt_dict.update([(a["id"], mkt["id"]) for a in assets])
         else:
             for bundle in bundles.values():
-                assets = bundle['assets'].values()
-                asset_mkt_dict.update([(a['id'], mkt['id']) for a in assets])
+                assets = bundle["assets"].values()
+                asset_mkt_dict.update([(a["id"], mkt["id"]) for a in assets])
     return asset_mkt_dict
 
 
 def _order_market_dict(markets):
     asset_mkt_dict = dict()
     for mkt in markets.values():
-        bundles = mkt['bundle']
-        if 'assets' in bundles:
-            assets = bundles['assets'].values()
-            asset_mkt_dict.update([(a['order'], mkt['id']) for a in assets])
+        bundles = mkt["bundle"]
+        if "assets" in bundles:
+            assets = bundles["assets"].values()
+            asset_mkt_dict.update([(a["order"], mkt["id"]) for a in assets])
         else:
             for bundle in bundles.values():
-                assets = bundle['assets'].values()
-                asset_mkt_dict.update([(a['order'], mkt['id']) for a in assets])
+                assets = bundle["assets"].values()
+                asset_mkt_dict.update([(a["order"], mkt["id"]) for a in assets])
     return asset_mkt_dict
